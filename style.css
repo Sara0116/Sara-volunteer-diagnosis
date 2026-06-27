@@ -173,6 +173,22 @@ select:focus {
   gap: 10px;
 }
 
+.check-group {
+  display: grid;
+  gap: 10px;
+}
+
+.check-group + .check-group {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.check-group strong {
+  font-size: 13px;
+  color: var(--blue);
+}
+
 .check-list label {
   display: flex;
   align-items: center;
@@ -206,6 +222,38 @@ select:focus {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-top: 12px;
+}
+
+.wide-button {
+  grid-column: 1 / -1;
+}
+
+.upload-status {
+  margin-top: 10px;
+  border-radius: 6px;
+  padding: 9px 10px;
+  background: #f8fafc;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.upload-status.success {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.upload-status.error {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.sheet-picker {
+  margin-top: 10px;
+}
+
+.hidden {
+  display: none !important;
 }
 
 .rule-box {
@@ -356,6 +404,77 @@ td:nth-child(4) {
 .source-cell {
   color: #334155;
   line-height: 1.58;
+}
+
+.analysis-stack {
+  display: grid;
+  gap: 8px;
+  min-width: 360px;
+}
+
+.analysis-line {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 8px;
+  line-height: 1.55;
+}
+
+.analysis-line strong {
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 999px;
+  padding: 3px 9px;
+  background: #eef2f7;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.chip.good {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.chip.warn {
+  background: var(--amber-soft);
+  color: #9a650c;
+}
+
+.chip.danger {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.chip.source {
+  background: #edf5ff;
+  color: var(--blue);
+}
+
+.text-good {
+  color: var(--green);
+  font-weight: 800;
+}
+
+.text-warn {
+  color: #9a650c;
+  font-weight: 800;
+}
+
+.text-danger {
+  color: var(--red);
+  font-weight: 900;
 }
 
 .score-pill,

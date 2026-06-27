@@ -1,55 +1,57 @@
 const sampleRows = [
-  { order: 1, school: "中国计量大学", feature: "省重点/行业特色", risk: "冲", probability: "9%", major: "数据科学与大数据技术", plan: 50, minScore: 596, minRank: 56470 },
-  { order: 2, school: "中国计量大学", feature: "省重点/行业特色", risk: "冲", probability: "11%", major: "人工智能", plan: 60, minScore: 595, minRank: 57039 },
-  { order: 3, school: "浙江财经大学", feature: "省重点/保研", risk: "冲", probability: "13%", major: "软件工程", plan: 55, minScore: 595, minRank: 57316 },
-  { order: 4, school: "浙江财经大学", feature: "省重点/保研", risk: "冲", probability: "14%", major: "应用统计学", plan: 10, minScore: 595, minRank: 57458 },
-  { order: 5, school: "温州大学", feature: "省重点", risk: "冲", probability: "21%", major: "电气工程及其自动化(卓工超豪示范班)", plan: 107, minScore: 594, minRank: 58936 },
-  { order: 6, school: "温州大学", feature: "省重点", risk: "冲", probability: "36%", major: "计算机科学与技术", plan: 62, minScore: 592, minRank: 61049 },
-  { order: 7, school: "浙江农林大学", feature: "省重点/保研", risk: "冲", probability: "37%", major: "数据科学与大数据技术(东湖校区)", plan: 39, minScore: 592, minRank: 61206 },
-  { order: 8, school: "浙江农林大学", feature: "省重点/保研", risk: "冲", probability: "41%", major: "智能科学与技术(东湖校区)", plan: 42, minScore: 591, minRank: 61809 },
-  { order: 9, school: "浙江农林大学", feature: "省重点/保研", risk: "冲", probability: "47%", major: "电子信息工程(东湖校区)", plan: 77, minScore: 591, minRank: 62479 },
-  { order: 10, school: "浙江农林大学", feature: "省重点/保研", risk: "稳", probability: "51%", major: "机械设计制造及其自动化", plan: 78, minScore: 590, minRank: 63205 },
-  { order: 11, school: "浙江科技大学", feature: "应用型工科", risk: "稳", probability: "62%", major: "机器人工程(卓越创新班)", plan: 30, minScore: 587, minRank: 66373 },
-  { order: 12, school: "浙江农林大学", feature: "省重点/保研", risk: "稳", probability: "65%", major: "应用统计学(东湖校区)", plan: 40, minScore: 587, minRank: 66367 },
-  { order: 13, school: "浙大城市学院", feature: "杭州/应用型", risk: "稳", probability: "68%", major: "计算机科学与技术", plan: 95, minScore: 587, minRank: 67027 },
-  { order: 14, school: "浙大城市学院", feature: "杭州/应用型", risk: "稳", probability: "70%", major: "人工智能", plan: 14, minScore: 587, minRank: 67409 },
-  { order: 15, school: "温州大学", feature: "省重点", risk: "稳", probability: "71%", major: "信息与计算科学", plan: 27, minScore: 586, minRank: 67582 },
-  { order: 16, school: "温州大学", feature: "省重点", risk: "稳", probability: "73%", major: "数据科学与大数据技术", plan: 52, minScore: 586, minRank: 68037 },
-  { order: 17, school: "浙大城市学院", feature: "杭州/应用型", risk: "稳", probability: "76%", major: "自动化", plan: 65, minScore: 585, minRank: 68887 },
-  { order: 20, school: "浙江传媒学院", feature: "传媒特色", risk: "稳", probability: "82%", major: "数字媒体技术", plan: 33, minScore: 582, minRank: 73367 },
-  { order: 21, school: "浙江科技大学", feature: "应用型工科", risk: "保", probability: "87%", major: "电气工程及其自动化", plan: 145, minScore: 583, minRank: 71998 },
-  { order: 22, school: "浙大城市学院", feature: "杭州/应用型", risk: "保", probability: "88%", major: "软件工程", plan: 95, minScore: 582, minRank: 72444 },
-  { order: 25, school: "常州大学", feature: "外省/省重点", risk: "稳", probability: "42%", major: "人工智能(西太湖校区)", plan: 1, minScore: 581, minRank: 74117 },
-  { order: 27, school: "浙江师范大学", feature: "省重点/保研", risk: "保", probability: "96%", major: "环境科学与工程", plan: 30, minScore: 579, minRank: 76210 },
-  { order: 34, school: "浙江科技大学", feature: "应用型工科", risk: "保", probability: "99%", major: "软件工程(安吉校区)", plan: 113, minScore: 576, minRank: 80507 },
-  { order: 43, school: "嘉兴大学", feature: "普通公办", risk: "保", probability: ">99%", major: "计算机科学与技术(梁林校区)", plan: 50, minScore: 572, minRank: 84809 },
+  { order: 1, school: "中国计量大学", feature: "省重点/行业特色", risk: "冲", probability: "9%", major: "数据科学与大数据技术", plan: 50, tuition: 4800, admissionCount: 50, minScore: 596, minRank: 56470 },
+  { order: 2, school: "中国计量大学", feature: "省重点/行业特色", risk: "冲", probability: "11%", major: "人工智能", plan: 60, tuition: 5500, admissionCount: 76, minScore: 595, minRank: 57039 },
+  { order: 3, school: "浙江财经大学", feature: "省重点/保研", risk: "冲", probability: "13%", major: "软件工程", plan: 55, tuition: 6000, admissionCount: 145, minScore: 595, minRank: 57316 },
+  { order: 4, school: "浙江财经大学", feature: "省重点/保研", risk: "冲", probability: "14%", major: "应用统计学", plan: 10, tuition: 5300, admissionCount: 30, minScore: 595, minRank: 57458 },
+  { order: 5, school: "温州大学", feature: "省重点", risk: "冲", probability: "21%", major: "电气工程及其自动化(卓工超豪示范班)", plan: 107, tuition: 5500, admissionCount: 98, minScore: 594, minRank: 58936 },
+  { order: 6, school: "温州大学", feature: "省重点", risk: "冲", probability: "36%", major: "计算机科学与技术", plan: 62, tuition: 5500, admissionCount: 74, minScore: 592, minRank: 61049 },
+  { order: 7, school: "浙江农林大学", feature: "省重点/保研", risk: "冲", probability: "37%", major: "数据科学与大数据技术(东湖校区)", plan: 39, tuition: 6000, admissionCount: 39, minScore: 592, minRank: 61206 },
+  { order: 8, school: "浙江农林大学", feature: "省重点/保研", risk: "冲", probability: "41%", major: "智能科学与技术(东湖校区)", plan: 42, tuition: 6000, admissionCount: 42, minScore: 591, minRank: 61809 },
+  { order: 9, school: "浙江农林大学", feature: "省重点/保研", risk: "冲", probability: "47%", major: "电子信息工程(东湖校区)", plan: 77, tuition: 6000, admissionCount: 81, minScore: 591, minRank: 62479 },
+  { order: 10, school: "浙江农林大学", feature: "省重点/保研", risk: "稳", probability: "51%", major: "机械设计制造及其自动化", plan: 78, tuition: 6000, admissionCount: 61, minScore: 590, minRank: 63205 },
+  { order: 11, school: "浙江科技大学", feature: "应用型工科", risk: "稳", probability: "62%", major: "机器人工程(卓越创新班)", plan: 30, tuition: 6300, admissionCount: 30, minScore: 587, minRank: 66373 },
+  { order: 12, school: "浙江农林大学", feature: "省重点/保研", risk: "稳", probability: "65%", major: "应用统计学(东湖校区)", plan: 40, tuition: 5300, admissionCount: 39, minScore: 587, minRank: 66367 },
+  { order: 13, school: "浙大城市学院", feature: "杭州/应用型", risk: "稳", probability: "68%", major: "计算机科学与技术", plan: 95, tuition: 6300, admissionCount: 99, minScore: 587, minRank: 67027 },
+  { order: 14, school: "浙大城市学院", feature: "杭州/应用型", risk: "稳", probability: "70%", major: "人工智能", plan: 14, tuition: 5500, admissionCount: 14, minScore: 587, minRank: 67409 },
+  { order: 15, school: "温州大学", feature: "省重点", risk: "稳", probability: "71%", major: "信息与计算科学", plan: 27, tuition: 4800, admissionCount: 27, minScore: 586, minRank: 67582 },
+  { order: 16, school: "温州大学", feature: "省重点", risk: "稳", probability: "73%", major: "数据科学与大数据技术", plan: 52, tuition: 5500, admissionCount: 60, minScore: 586, minRank: 68037 },
+  { order: 17, school: "浙大城市学院", feature: "杭州/应用型", risk: "稳", probability: "76%", major: "自动化", plan: 65, tuition: 5500, admissionCount: 49, minScore: 585, minRank: 68887 },
+  { order: 20, school: "浙江传媒学院", feature: "传媒特色", risk: "稳", probability: "82%", major: "数字媒体技术", plan: 33, tuition: 5500, admissionCount: 33, minScore: 582, minRank: 73367 },
+  { order: 21, school: "浙江科技大学", feature: "应用型工科", risk: "保", probability: "87%", major: "电气工程及其自动化", plan: 145, tuition: 6300, admissionCount: 104, minScore: 583, minRank: 71998 },
+  { order: 22, school: "浙大城市学院", feature: "杭州/应用型", risk: "保", probability: "88%", major: "软件工程", plan: 95, tuition: 6300, admissionCount: 64, minScore: 582, minRank: 72444 },
+  { order: 25, school: "常州大学", feature: "外省/省重点", risk: "稳", probability: "42%", major: "人工智能(西太湖校区)", plan: 1, tuition: 5800, admissionCount: "", minScore: 581, minRank: 74117 },
+  { order: 27, school: "浙江师范大学", feature: "省重点/保研", risk: "保", probability: "96%", major: "环境科学与工程", plan: 30, tuition: 6000, admissionCount: 40, minScore: 579, minRank: 76210 },
+  { order: 34, school: "浙江科技大学", feature: "应用型工科", risk: "保", probability: "99%", major: "软件工程(安吉校区)", plan: 113, tuition: 5500, admissionCount: 108, minScore: 576, minRank: 80507 },
+  { order: 43, school: "嘉兴大学", feature: "普通公办", risk: "保", probability: ">99%", major: "计算机科学与技术(梁林校区)", plan: 50, tuition: 6325, admissionCount: 62, minScore: 572, minRank: 84809 },
 ];
 
 const schoolProfiles = [
-  { match: /中国计量大学/, score: 86, source: "学校层次：省重点/行业特色", text: "省重点、行业特色强，计量、质量、仪器、信息工程认可度较好；非双一流。" },
-  { match: /浙江财经大学/, score: 85, source: "学校层次：省重点/财经特色/保研", text: "省重点、财经特色明显，有保研资格，省内财经口碑强；非双一流。" },
-  { match: /浙江师范大学/, score: 84, source: "学校层次：省重点/保研", text: "省重点、有保研资格，省属综合层次较高；师范与基础学科更强。" },
-  { match: /温州大学/, score: 78, source: "学校层次：省重点建设", text: "省重点建设高校，区域综合大学，省内认可度中上。" },
-  { match: /浙江农林大学/, score: 77, source: "学校层次：省重点/保研", text: "省重点、有保研资格，杭州区位加分；信息类可选但不是学校最强底色。" },
-  { match: /浙大城市学院/, score: 75, source: "学校层次：杭州/应用型本科", text: "杭州区位和品牌有加分，应用型本科，城市资源较好。" },
-  { match: /浙江科技大学/, score: 73, source: "学校层次：应用型工科", text: "应用型工科院校，省内工科就业导向明确，实践型专业有性价比。" },
-  { match: /浙江传媒学院/, score: 71, source: "学校层次：传媒特色", text: "传媒特色明显，数字媒体和传媒技术有学校特色；纯工科平台不如工科院校。" },
-  { match: /浙江海洋大学/, score: 68, source: "学校层次：省内公办", text: "省内公办，区域和海洋特色明显，信息/电气可作就业型保底。" },
-  { match: /嘉兴大学/, score: 64, source: "学校层次：普通公办", text: "普通省内公办，区位尚可，适合作为保专业和保公办选择。" },
-  { match: /常州大学/, score: 66, source: "学校层次：外省省属高校", text: "外省省属高校，化工材料底色更强；小计划热门专业需谨慎。" },
+  { match: /中国计量大学/, score: 86, level: "省重点/行业特色", chip: "行业特色", source: "学校层次：省重点/行业特色", text: "省重点，计量、质量、仪器、信息工程认可度较好；非双一流。" },
+  { match: /浙江财经大学/, score: 85, level: "省重点/财经特色/保研", chip: "财经口碑", source: "学校层次：省重点/财经特色/保研", text: "省重点，有保研资格，省内财经口碑强；非双一流。" },
+  { match: /浙江师范大学/, score: 84, level: "省重点/保研", chip: "省属高层次", source: "学校层次：省重点/保研", text: "省重点、有保研资格，省属综合层次较高；师范与基础学科更强。" },
+  { match: /温州大学/, score: 78, level: "省重点建设", chip: "省内认可", source: "学校层次：省重点建设", text: "省重点建设高校，区域综合大学，省内认可度中上。" },
+  { match: /浙江农林大学/, score: 77, level: "省重点/保研", chip: "杭州区位", source: "学校层次：省重点/保研", text: "省重点、有保研资格，杭州区位加分；信息类可选但不是学校最强底色。" },
+  { match: /浙大城市学院/, score: 75, level: "杭州/应用型本科", chip: "杭州资源", source: "学校层次：杭州/应用型本科", text: "杭州区位和品牌有加分，应用型本科，城市资源较好。" },
+  { match: /浙江科技大学/, score: 73, level: "应用型工科", chip: "工科应用", source: "学校层次：应用型工科", text: "应用型工科院校，省内工科就业导向明确，实践型专业有性价比。" },
+  { match: /浙江传媒学院/, score: 71, level: "传媒特色", chip: "特色院校", source: "学校层次：传媒特色", text: "传媒特色明显，数字媒体和传媒技术有学校特色；纯工科平台不如工科院校。" },
+  { match: /浙江海洋大学/, score: 68, level: "省内公办", chip: "公办保底", source: "学校层次：省内公办", text: "省内公办，区域和海洋特色明显，信息/电气可作就业型保底。" },
+  { match: /嘉兴大学/, score: 64, level: "普通公办", chip: "公办保底", source: "学校层次：普通公办", text: "普通省内公办，区位尚可，适合作为保专业和保公办选择。" },
+  { match: /常州大学/, score: 66, level: "外省省属高校", chip: "外省", source: "学校层次：外省省属高校", text: "外省省属高校，化工材料底色更强；小计划热门专业需谨慎。" },
 ];
 
 const majorProfiles = [
-  { match: /计算机科学与技术|软件工程/, employment: 92, postgrad: 82, civil: 88, category: "就业强", source: "岗位：Java/后端/测试/运维/政企信息化", text: "开发、测试、运维、数据开发和政企信息化岗位面宽；考研和考公适配都较好。" },
-  { match: /电气工程|自动化/, employment: 88, postgrad: 80, civil: 62, category: "就业稳", source: "岗位：电气工程师/自动化/新能源/设备调试", text: "电气工程师、自动化、新能源、设备调试需求稳定；读研利于电网、设计院和国企。" },
-  { match: /电子信息|通信工程/, employment: 84, postgrad: 82, civil: 65, category: "就业稳", source: "岗位：嵌入式/硬件测试/通信/物联网", text: "嵌入式、硬件测试、通信、物联网岗位较多；考研可转电子信息、通信、控制。" },
-  { match: /数据科学|大数据|应用统计/, employment: 82, postgrad: 88, civil: 80, category: "考研考公友好", source: "岗位：数据分析/数仓/风控/统计调查", text: "可走数据分析、数仓、风控、金融科技；读研增值明显，考公有统计、税务、数字政务方向。" },
-  { match: /人工智能|智能科学/, employment: 74, postgrad: 92, civil: 58, category: "读研增值", source: "岗位：算法/AI应用/数据/测试", text: "算法岗热但门槛高，本科更现实是开发、数据、测试或AI应用；读研提升明显。" },
-  { match: /机器人工程/, employment: 78, postgrad: 82, civil: 45, category: "实践导向", source: "岗位：PLC/机器人调试/机器视觉/系统集成", text: "机器人调试、PLC、机器视觉、系统集成和智能制造方向；项目实践很关键。" },
-  { match: /机械设计|智能制造/, employment: 70, postgrad: 70, civil: 42, category: "现场属性", source: "岗位：机械设计/工艺/设备/非标自动化", text: "机械设计、工艺、设备、非标自动化岗位稳定，但现场属性强，起薪通常普通。" },
-  { match: /环境科学|环境工程/, employment: 56, postgrad: 78, civil: 72, category: "慎填", source: "岗位：环评/检测/EHS/生态环境考公", text: "环评、检测、环保工程、EHS有岗位，但本科就业弱于硬工科；更适合考研或环保考公。" },
-  { match: /数字媒体技术/, employment: 76, postgrad: 68, civil: 55, category: "特色应用", source: "岗位：前端/交互/三维/传媒大数据", text: "适合前端、交互、三维、游戏技术、传媒大数据和数字产品，作品集和项目重要。" },
-  { match: /信息与计算科学/, employment: 68, postgrad: 86, civil: 66, category: "考研增值", source: "方向：数学+计算机/统计/金融数学", text: "数学和计算机底子较好，直接就业不如计算机清晰，适合考研转计算机、统计或金融数学。" },
+  { match: /计算机科学与技术|软件工程/, employment: 92, postgrad: 82, civil: 88, category: "就业强", chips: ["就业强", "考公友好"], source: "岗位：Java/后端/测试/运维/政企信息化", jobs: "开发、测试、运维、数据开发、政企信息化", postgradText: "可冲更好平台或转AI/网安/软件方向", civilText: "计算机类岗位相对多" },
+  { match: /电气工程|自动化/, employment: 88, postgrad: 80, civil: 62, category: "就业稳", chips: ["就业稳", "工科"], source: "岗位：电气工程师/自动化/新能源/设备调试", jobs: "电气工程师、自动化、新能源、设备调试", postgradText: "读研利于电网、设计院和国企", civilText: "考公岗位少于计算机/统计" },
+  { match: /电子信息|通信工程/, employment: 84, postgrad: 82, civil: 65, category: "就业稳", chips: ["就业稳", "读研增值"], source: "岗位：嵌入式/硬件测试/通信/物联网", jobs: "嵌入式、硬件测试、通信、物联网", postgradText: "可转电子信息、通信、控制、集成电路", civilText: "技术岗有少量机会" },
+  { match: /数据科学|大数据|应用统计/, employment: 82, postgrad: 88, civil: 80, category: "考研考公友好", chips: ["数据方向", "考公友好"], source: "岗位：数据分析/数仓/风控/统计调查", jobs: "数据分析、数仓、风控、金融科技", postgradText: "读研增值明显，可转统计/计算机/金融科技", civilText: "统计、税务、数字政务可看" },
+  { match: /人工智能|智能科学/, employment: 74, postgrad: 92, civil: 58, category: "读研增值", chips: ["读研增值", "本科门槛高"], source: "岗位：算法/AI应用/数据/测试", jobs: "AI应用、数据、测试、开发，算法岗门槛高", postgradText: "强烈增值，硕士更适合算法/机器学习", civilText: "多按计算机类尝试，稳定性一般" },
+  { match: /机器人工程/, employment: 78, postgrad: 82, civil: 45, category: "实践导向", chips: ["实践导向", "现场属性"], source: "岗位：PLC/机器人调试/机器视觉/系统集成", jobs: "PLC、机器人调试、机器视觉、系统集成", postgradText: "转控制/自动化/机器人方向提升上限", civilText: "考公岗位少" },
+  { match: /机械设计|智能制造/, employment: 70, postgrad: 70, civil: 42, category: "现场属性", chips: ["制造业", "现场属性"], source: "岗位：机械设计/工艺/设备/非标自动化", jobs: "机械设计、工艺、设备、非标自动化", postgradText: "可转智能制造、机械电子、车辆/机器人", civilText: "岗位较少" },
+  { match: /环境科学|环境工程|生物|食品|材料|化学/, employment: 56, postgrad: 78, civil: 72, category: "慎填", chips: ["慎填", "考研/考公更适合"], source: "岗位：环评/检测/EHS/生态环境考公", jobs: "环评、检测、环保工程、EHS", postgradText: "读研后进研究院/设计院/环保系统更好", civilText: "生态环境、自然资源等岗位匹配" },
+  { match: /数字媒体技术/, employment: 76, postgrad: 68, civil: 55, category: "特色应用", chips: ["特色应用", "看作品集"], source: "岗位：前端/交互/三维/传媒大数据", jobs: "前端、交互、三维、传媒大数据、数字产品", postgradText: "可转计算机、数字媒体、交互设计", civilText: "一般看是否按计算机类认可" },
+  { match: /信息与计算科学|数学|金融数学/, employment: 68, postgrad: 86, civil: 66, category: "考研增值", chips: ["数学要求高", "考研增值"], source: "方向：数学+计算机/统计/金融数学", jobs: "需补编程，可走数据分析、开发或算法助理", postgradText: "适合转计算机、统计、金融数学", civilText: "数学/统计/部分信息化岗位可看" },
+  { match: /师范|科学教育/, employment: 66, postgrad: 72, civil: 70, category: "师范方向", chips: ["师范方向"], source: "方向：教师编制/教育系统", jobs: "教师、教培、教育科技、教育系统", postgradText: "教育硕士或学科教学提升就业稳定性", civilText: "教师编、事业单位适配" },
+  { match: /医学|护理|药学|中医/, employment: 68, postgrad: 78, civil: 68, category: "医学药学", chips: ["职业路径明确"], source: "方向：医疗卫生/药企/事业单位", jobs: "医疗卫生、药企、检验、医药代表", postgradText: "深造价值较高", civilText: "卫健系统和事业单位可看" },
 ];
 
 const headerAliases = {
@@ -60,12 +62,16 @@ const headerAliases = {
   probability: ["专业录取概率", "录取概率"],
   major: ["专业", "专业名称"],
   plan: ["计划", "招生计划", "计划数"],
+  tuition: ["学费"],
+  admissionCount: ["录取人数", "人数"],
   minScore: ["最低分", "分数线"],
   minRank: ["最低位次", "位次"],
 };
 
 let currentRows = [...sampleRows];
 let analyzedRows = [];
+let workbookCache = null;
+let sheetAnalyses = [];
 
 function getProfile(list, value, fallback) {
   return list.find((item) => item.match.test(value)) || fallback;
@@ -100,12 +106,42 @@ function admissionScore(row, rank) {
 
 function riskPenalty(row, prefs, majorProfile) {
   let penalty = 0;
+  const subjects = document.querySelector("#subjectInput").value || "";
+  const school = row.school || "";
+  const major = row.major || "";
+  const isOutsideZhejiang = !/浙江|温州|嘉兴|杭州|浙大|中国计量/.test(school);
+
   if ((Number(row.plan) || 0) <= 2) penalty += 12;
-  if (prefs.includes("environment") && /环境/.test(row.major)) penalty += 18;
-  if (prefs.includes("fieldwork") && /机械|机器人|智能制造/.test(row.major)) penalty += 8;
-  if (prefs.includes("outsideSmallPlan") && !/浙江|温州|嘉兴|杭州|浙大|中国计量/.test(row.school) && (Number(row.plan) || 0) <= 2) penalty += 12;
+  if (prefs.includes("outsideSchool") && isOutsideZhejiang) penalty += 10;
+  if (prefs.includes("outsideSmallPlan") && isOutsideZhejiang && (Number(row.plan) || 0) <= 2) penalty += 12;
+  if (prefs.includes("highTuition") && (/中外|合作|高收费/.test(major) || Number(row.tuition) >= 15000)) penalty += 18;
+  if (prefs.includes("fieldwork") && /机械|机器人|智能制造|自动化/.test(major)) penalty += 8;
+  if (prefs.includes("researchDependent") && /人工智能|智能科学|信息与计算|数学|环境|金融数学/.test(major)) penalty += 10;
+  if (prefs.includes("unclearEmployment") && /人工智能|智能科学|金融数学|数字经济|管理科学/.test(major)) penalty += 8;
+  if (prefs.includes("environment") && /环境|生物|食品|材料|化学/.test(major)) penalty += 18;
+  if (prefs.includes("coldTraditional") && /农学|林学|海洋|水产|地质|矿业|纺织/.test(major)) penalty += 12;
+  if (prefs.includes("teacher") && /师范|科学教育/.test(major)) penalty += 12;
+  if (prefs.includes("medical") && /医学|护理|药学|中医/.test(major)) penalty += 12;
+  if (prefs.includes("mathHeavy") && /统计|数据科学|人工智能|数学|金融数学|信息与计算/.test(major)) penalty += 8;
+  if (prefs.includes("csCompetition") && /计算机|软件|人工智能/.test(major)) penalty += 5;
   if (majorProfile.category === "慎填") penalty += 8;
+  if (needsPhysicsChemistry(major) && (!subjects.includes("物") || !subjects.includes("化"))) penalty += 28;
   return penalty;
+}
+
+function needsPhysicsChemistry(major) {
+  return /计算机|软件|数据科学|大数据|人工智能|智能科学|电气|自动化|电子信息|通信|机器人工程|机械|智能制造|数字媒体技术/.test(major);
+}
+
+function subjectResult(major) {
+  const subjects = document.querySelector("#subjectInput").value || "";
+  if (!needsPhysicsChemistry(major)) {
+    return { text: `${subjects}；仍需核对招生计划书`, tone: "warn" };
+  }
+  if (subjects.includes("物") && subjects.includes("化")) {
+    return { text: `${subjects}；硬工科通常适配`, tone: "good" };
+  }
+  return { text: `${subjects}；可能不满足物化要求，需重点核对`, tone: "danger" };
 }
 
 function analyzeRow(row) {
@@ -114,6 +150,8 @@ function analyzeRow(row) {
   const prefs = getRejectedPrefs();
   const schoolProfile = getProfile(schoolProfiles, row.school, {
     score: 62,
+    level: "待核",
+    chip: "学校待核",
     source: "学校层次：待核",
     text: "学校层次需进一步核对，先按普通本科处理。",
   });
@@ -122,8 +160,11 @@ function analyzeRow(row) {
     postgrad: 65,
     civil: 55,
     category: "待核",
+    chips: ["专业待核"],
     source: "专业来源：待核",
-    text: "专业出口需结合课程、就业岗位和学校介绍进一步核对。",
+    jobs: "需结合课程、就业岗位和学校介绍核对",
+    postgradText: "需核对硕士方向",
+    civilText: "需核对职位表专业目录",
   });
   const admission = admissionScore(row, rank);
   const weights = getGoalWeights(goal);
@@ -139,9 +180,40 @@ function analyzeRow(row) {
     penalty;
   const finalScore = Math.round(clamp(score, 20, 98));
   const tag = getTag(finalScore, penalty);
-  const analysis = `${schoolProfile.text} 专业：${majorProfile.text} 综合：建议分 ${finalScore}，${tag}。`;
-  const sources = `招录：浙江省教育考试院投档线；${schoolProfile.source}；${majorProfile.source}；考公：国考/省考职位表；就业：Boss直聘岗位关键词热度。`;
-  return { ...row, score: finalScore, tag, analysis, sources, penalty };
+  const subject = subjectResult(row.major);
+  const chips = [
+    { text: schoolProfile.chip, tone: "source" },
+    ...majorProfile.chips.map((text) => ({ text, tone: chipTone(text) })),
+    { text: `建议分 ${finalScore}`, tone: tag === "慎填" ? "danger" : tag === "后移" ? "warn" : "good" },
+    { text: tag, tone: tag === "慎填" ? "danger" : tag === "后移" ? "warn" : "good" },
+  ];
+  if ((Number(row.plan) || 0) <= 2) chips.push({ text: "小计划风险", tone: "danger" });
+  if (penalty > 0) chips.push({ text: `风险扣分 ${penalty}`, tone: penalty >= 18 ? "danger" : "warn" });
+
+  return {
+    ...row,
+    score: finalScore,
+    tag,
+    penalty,
+    chips,
+    analysisParts: {
+      school: `${schoolProfile.level}；${schoolProfile.text}`,
+      jobs: majorProfile.jobs,
+      postgrad: majorProfile.postgradText,
+      civil: majorProfile.civilText,
+      subject: subject.text,
+      subjectTone: subject.tone,
+      advice: `${finalScore}分，${tag}`,
+    },
+    analysis: `${schoolProfile.text} 就业：${majorProfile.jobs}。考研：${majorProfile.postgradText}。考公：${majorProfile.civilText}。选科：${subject.text}。建议：${finalScore}分，${tag}。`,
+    sources: `浙江考试院；招生计划书选考要求；${schoolProfile.source}；${majorProfile.source}；国考/省考职位表；Boss岗位关键词。`,
+  };
+}
+
+function chipTone(text) {
+  if (/强|友好|稳|增值|特色|数据/.test(text)) return "good";
+  if (/慎填|门槛|现场|要求高|待核/.test(text)) return "warn";
+  return "";
 }
 
 function getTag(score, penalty) {
@@ -172,12 +244,39 @@ function renderOriginal(rows) {
           <td>${escapeText(row.risk)}</td>
           <td><span class="score-pill">${row.score}</span></td>
           <td><span class="tag-pill ${tagClass(row.tag)}">${row.tag}</span></td>
-          <td class="analysis-cell">${escapeText(row.analysis)}</td>
-          <td class="source-cell">${escapeText(row.sources)}</td>
+          <td class="analysis-cell">${renderAnalysis(row)}</td>
+          <td class="source-cell">${renderSources(row.sources)}</td>
         </tr>
       `,
     )
     .join("");
+}
+
+function renderAnalysis(row) {
+  const part = row.analysisParts;
+  return `
+    <div class="analysis-stack">
+      <div class="chip-row">${row.chips.map((chip) => `<span class="chip ${chip.tone}">${escapeText(chip.text)}</span>`).join("")}</div>
+      ${analysisLine("学校", part.school)}
+      ${analysisLine("就业", part.jobs)}
+      ${analysisLine("考研", part.postgrad)}
+      ${analysisLine("考公", part.civil)}
+      ${analysisLine("选科", part.subject, part.subjectTone)}
+      ${analysisLine("建议", part.advice)}
+    </div>
+  `;
+}
+
+function analysisLine(label, value, tone = "") {
+  return `<div class="analysis-line"><strong>${label}</strong><span class="${tone ? `text-${tone}` : ""}">${escapeText(value)}</span></div>`;
+}
+
+function renderSources(sourceText) {
+  return `
+    <div class="chip-row">
+      ${sourceText.split("；").filter(Boolean).map((text) => `<span class="chip source">${escapeText(text)}</span>`).join("")}
+    </div>
+  `;
 }
 
 function renderAdjusted(rows) {
@@ -185,9 +284,12 @@ function renderAdjusted(rows) {
   document.querySelector("#adjustedBody").innerHTML = adjusted
     .map((row, index) => {
       const changed = Number(row.order) !== index + 1;
-      const remark = changed
-        ? `按浙江规则调整：原序号 ${row.order} 调整到 ${index + 1}。理由：综合建议分 ${row.score}，标签为“${row.tag}”，系统认为它更适合放在当前位置。`
-        : "原位置基本合理。";
+      const reasons = [
+        `建议分 ${row.score}`,
+        `标签 ${row.tag}`,
+        row.analysisParts.jobs,
+        row.penalty ? `风险扣分 ${row.penalty}` : "无明显偏好扣分",
+      ];
       return `
         <tr class="${changed ? "highlight-row" : ""}">
           <td>${index + 1}</td>
@@ -196,7 +298,13 @@ function renderAdjusted(rows) {
           <td>${escapeText(row.major)}</td>
           <td><span class="score-pill">${row.score}</span></td>
           <td><span class="tag-pill ${tagClass(row.tag)}">${row.tag}</span></td>
-          <td class="analysis-cell">${escapeText(remark)}</td>
+          <td class="analysis-cell">
+            <div class="analysis-stack">
+              <div class="chip-row">${reasons.map((reason) => `<span class="chip ${row.tag === "慎填" ? "danger" : ""}">${escapeText(reason)}</span>`).join("")}</div>
+              ${analysisLine("调整", changed ? `原序号 ${row.order} 调整到 ${index + 1}` : "原位置基本合理")}
+              ${analysisLine("原因", "按浙江专业平行志愿规则，优先放更愿意被录取且综合价值更高的院校专业。")}
+            </div>
+          </td>
         </tr>
       `;
     })
@@ -220,47 +328,148 @@ function runAnalysis() {
   updateSummary(analyzedRows);
 }
 
-function normalizeRow(raw, index) {
+function normalizeRow(raw, index, fieldMap) {
   const get = (field) => {
-    const candidates = headerAliases[field];
-    const key = Object.keys(raw).find((name) => candidates.includes(String(name).trim()));
-    return key ? raw[key] : "";
+    const header = fieldMap[field];
+    return header ? raw[header] : "";
   };
   return {
-    order: Number(get("order")) || index + 1,
+    order: toNumber(get("order")) || index + 1,
     school: String(get("school") || "").trim(),
     feature: String(get("feature") || "").trim(),
     risk: String(get("risk") || "").trim(),
     probability: String(get("probability") || "").trim(),
     major: String(get("major") || "").trim(),
-    plan: Number(get("plan")) || "",
-    minScore: Number(get("minScore")) || "",
-    minRank: Number(get("minRank")) || "",
+    plan: toNumber(get("plan")) || "",
+    tuition: toNumber(get("tuition")) || "",
+    admissionCount: toNumber(get("admissionCount")) || "",
+    minScore: toNumber(get("minScore")) || "",
+    minRank: toNumber(get("minRank")) || "",
   };
+}
+
+function analyzeSheet(sheet, sheetName) {
+  const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+  let best = null;
+  const maxScan = Math.min(matrix.length, 12);
+  for (let rowIndex = 0; rowIndex < maxScan; rowIndex++) {
+    const headerRow = matrix[rowIndex].map((cell) => cleanHeader(cell));
+    const fieldMap = buildFieldMap(headerRow);
+    const score = fieldScore(fieldMap);
+    if (!best || score > best.score) best = { rowIndex, fieldMap, score };
+  }
+  if (!best || !best.fieldMap.school || !best.fieldMap.major) {
+    return { sheetName, rows: [], error: "没有找到“院校”和“专业”表头" };
+  }
+  const rows = matrix
+    .slice(best.rowIndex + 1)
+    .map((row) => {
+      const raw = {};
+      matrix[best.rowIndex].forEach((header, colIndex) => {
+        raw[cleanHeader(header)] = row[colIndex];
+      });
+      return raw;
+    })
+    .map((raw, index) => normalizeRow(raw, index, best.fieldMap))
+    .filter((row) => row.school && row.major && !Number.isNaN(Number(row.order)));
+  return {
+    sheetName,
+    rows,
+    headerRow: best.rowIndex,
+    fieldMap: best.fieldMap,
+    score: best.score + rows.length,
+    error: rows.length ? "" : "找到了表头，但没有识别到有效志愿行",
+  };
+}
+
+function buildFieldMap(headers) {
+  const fieldMap = {};
+  Object.entries(headerAliases).forEach(([field, aliases]) => {
+    const found = headers.find((header) => aliases.some((alias) => header === alias || header.includes(alias)));
+    if (found) fieldMap[field] = found;
+  });
+  return fieldMap;
+}
+
+function fieldScore(fieldMap) {
+  let score = 0;
+  ["school", "major"].forEach((field) => { if (fieldMap[field]) score += 10; });
+  ["order", "plan", "minScore", "minRank", "risk", "probability"].forEach((field) => { if (fieldMap[field]) score += 2; });
+  return score;
+}
+
+function cleanHeader(value) {
+  return String(value ?? "").replace(/\s+/g, "").trim();
 }
 
 function handleFile(event) {
   const file = event.target.files[0];
   if (!file) return;
+  setUploadStatus("正在解析文件...", "");
   document.querySelector("#fileLabel").textContent = file.name;
   if (!window.XLSX) {
-    alert("Excel 解析库没有加载成功，可以先用示例数据。");
+    setUploadStatus("Excel 解析库没有加载成功。请刷新页面后重试。", "error");
     return;
   }
   const reader = new FileReader();
+  reader.onerror = () => setUploadStatus("文件读取失败。请尝试把文件另存为 .xlsx 后重新上传。", "error");
   reader.onload = (loadEvent) => {
-    const workbook = XLSX.read(loadEvent.target.result, { type: "array" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-    const normalized = rawRows.map(normalizeRow).filter((row) => row.school && row.major);
-    if (!normalized.length) {
-      alert("没有识别到学校和专业列。请确认表头包含“院校”和“专业”。");
-      return;
+    try {
+      workbookCache = XLSX.read(loadEvent.target.result, { type: "array" });
+      sheetAnalyses = workbookCache.SheetNames.map((name) => analyzeSheet(workbookCache.Sheets[name], name));
+      renderSheetPicker();
+      const best = [...sheetAnalyses].sort((a, b) => (b.score || 0) - (a.score || 0))[0];
+      if (!best || !best.rows.length) {
+        const errors = sheetAnalyses.map((item) => `${item.sheetName}: ${item.error}`).join("；");
+        setUploadStatus(`解析失败：${errors || "没有识别到有效志愿表"}。建议检查表头是否包含“院校”和“专业”，或另存为标准 .xlsx。`, "error");
+        return;
+      }
+      applySheetAnalysis(best.sheetName);
+    } catch (error) {
+      setUploadStatus(`解析失败：${error.message || "文件格式异常"}。建议另存为 .xlsx 后重试。`, "error");
     }
-    currentRows = normalized;
-    runAnalysis();
   };
   reader.readAsArrayBuffer(file);
+}
+
+function renderSheetPicker() {
+  const wrap = document.querySelector("#sheetPickerWrap");
+  const picker = document.querySelector("#sheetPicker");
+  picker.innerHTML = sheetAnalyses
+    .map((item) => `<option value="${escapeAttr(item.sheetName)}">${escapeText(item.sheetName)}${item.rows.length ? `（${item.rows.length}条）` : "（未识别）"}</option>`)
+    .join("");
+  wrap.classList.toggle("hidden", sheetAnalyses.length <= 1);
+}
+
+function applySheetAnalysis(sheetName) {
+  const selected = sheetAnalyses.find((item) => item.sheetName === sheetName);
+  if (!selected || !selected.rows.length) {
+    setUploadStatus(`这个工作表无法识别：${selected?.error || "缺少院校和专业列"}`, "error");
+    return;
+  }
+  currentRows = selected.rows;
+  document.querySelector("#sheetPicker").value = sheetName;
+  setUploadStatus(`读取成功：工作表“${sheetName}”，识别 ${selected.rows.length} 条志愿。`, "success");
+  runAnalysis();
+}
+
+function clearUploadedFile() {
+  document.querySelector("#fileInput").value = "";
+  document.querySelector("#fileLabel").textContent = "选择 Excel 文件";
+  document.querySelector("#sheetPicker").innerHTML = "";
+  document.querySelector("#sheetPickerWrap").classList.add("hidden");
+  workbookCache = null;
+  sheetAnalyses = [];
+  currentRows = [...sampleRows];
+  setUploadStatus("已删除上传文件，当前恢复为示例数据。", "");
+  runAnalysis();
+}
+
+function setUploadStatus(message, type) {
+  const status = document.querySelector("#uploadStatus");
+  status.textContent = message;
+  status.classList.remove("success", "error");
+  if (type) status.classList.add(type);
 }
 
 function exportReport() {
@@ -279,7 +488,11 @@ function exportReport() {
     最低位次: row.minRank,
     综合建议分: row.score,
     调整标签: row.tag,
-    "学校层次+就业/考公/考研分析": row.analysis,
+    学校层次: row.analysisParts.school,
+    就业: row.analysisParts.jobs,
+    考研: row.analysisParts.postgrad,
+    考公: row.analysisParts.civil,
+    选科: row.analysisParts.subject,
     主要来源: row.sources,
   }));
   const adjustedSheet = sortForZhejiang(analyzedRows).map((row, index) => ({
@@ -311,6 +524,12 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function toNumber(value) {
+  if (value === "--" || value === "") return "";
+  const text = String(value ?? "").replace(/[^\d.]/g, "");
+  return text ? Number(text) : "";
+}
+
 function escapeText(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -318,6 +537,10 @@ function escapeText(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function escapeAttr(value) {
+  return escapeText(value).replaceAll("`", "&#096;");
 }
 
 function switchTab(tab) {
@@ -331,6 +554,8 @@ function switchTab(tab) {
 }
 
 document.querySelector("#fileInput").addEventListener("change", handleFile);
+document.querySelector("#clearFileButton").addEventListener("click", clearUploadedFile);
+document.querySelector("#sheetPicker").addEventListener("change", (event) => applySheetAnalysis(event.target.value));
 document.querySelector("#analyzeButton").addEventListener("click", runAnalysis);
 document.querySelector("#exportButton").addEventListener("click", exportReport);
 document.querySelectorAll(".tab").forEach((button) => {

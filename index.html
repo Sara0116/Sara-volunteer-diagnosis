@@ -31,7 +31,17 @@
             </label>
             <label>
               选科
-              <input id="subjectInput" type="text" value="物化政" />
+              <select id="subjectInput">
+                <option value="物化生">物化生</option>
+                <option value="物化政" selected>物化政</option>
+                <option value="物化地">物化地</option>
+                <option value="物生政">物生政</option>
+                <option value="物生地">物生地</option>
+                <option value="物政地">物政地</option>
+                <option value="史政地">史政地</option>
+                <option value="史政生">史政生</option>
+                <option value="史生地">史生地</option>
+              </select>
             </label>
             <label>
               目标偏好
@@ -47,10 +57,27 @@
 
         <section class="panel-section">
           <h2>不太接受</h2>
-          <div class="check-list">
-            <label><input type="checkbox" value="environment" checked /> 环境类前置</label>
-            <label><input type="checkbox" value="fieldwork" /> 工厂/现场属性强</label>
-            <label><input type="checkbox" value="outsideSmallPlan" checked /> 省外小计划</label>
+          <div class="check-group">
+            <strong>填报偏好</strong>
+            <div class="check-list">
+              <label><input type="checkbox" value="outsideSchool" /> 省外学校</label>
+              <label><input type="checkbox" value="outsideSmallPlan" checked /> 省外小计划</label>
+              <label><input type="checkbox" value="highTuition" /> 高学费/中外合作</label>
+              <label><input type="checkbox" value="fieldwork" /> 工厂/现场属性强</label>
+              <label><input type="checkbox" value="researchDependent" /> 强依赖考研</label>
+              <label><input type="checkbox" value="unclearEmployment" checked /> 本科就业不清晰</label>
+            </div>
+          </div>
+          <div class="check-group">
+            <strong>专业方向慎填</strong>
+            <div class="check-list">
+              <label><input type="checkbox" value="environment" checked /> 环境/生化/材料</label>
+              <label><input type="checkbox" value="coldTraditional" /> 农林海洋冷门</label>
+              <label><input type="checkbox" value="teacher" /> 师范方向</label>
+              <label><input type="checkbox" value="medical" /> 医学护理药学</label>
+              <label><input type="checkbox" value="mathHeavy" /> 数学要求高</label>
+              <label><input type="checkbox" value="csCompetition" /> 计算机高竞争</label>
+            </div>
           </div>
         </section>
 
@@ -61,9 +88,15 @@
             <strong id="fileLabel">选择 Excel 文件</strong>
             <span>不上传也可以先用示例数据体验</span>
           </label>
+          <div id="uploadStatus" class="upload-status">未上传文件，当前使用示例数据。</div>
+          <label id="sheetPickerWrap" class="sheet-picker hidden">
+            选择工作表
+            <select id="sheetPicker"></select>
+          </label>
           <div class="button-row">
             <button id="analyzeButton" type="button">开始诊断</button>
-            <button id="exportButton" type="button" class="secondary">导出 Excel</button>
+            <button id="clearFileButton" type="button" class="secondary">删除文件</button>
+            <button id="exportButton" type="button" class="secondary wide-button">导出 Excel</button>
           </div>
         </section>
 
