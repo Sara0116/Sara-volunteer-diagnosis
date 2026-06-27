@@ -44,6 +44,21 @@ const majorProfiles = [
   { match: /电气工程|自动化/, employment: 88, postgrad: 80, civil: 62, category: "就业稳", chips: ["就业稳", "工科"], source: "岗位：电气工程师/自动化/新能源/设备调试", jobs: "电气工程师、自动化、新能源、设备调试", postgradText: "读研利于电网、设计院和国企", civilText: "考公岗位少于计算机/统计" },
   { match: /电子信息|通信工程/, employment: 84, postgrad: 82, civil: 65, category: "就业稳", chips: ["就业稳", "读研增值"], source: "岗位：嵌入式/硬件测试/通信/物联网", jobs: "嵌入式、硬件测试、通信、物联网", postgradText: "可转电子信息、通信、控制、集成电路", civilText: "技术岗有少量机会" },
   { match: /数据科学|大数据|应用统计/, employment: 82, postgrad: 88, civil: 80, category: "考研考公友好", chips: ["数据方向", "考公友好"], source: "岗位：数据分析/数仓/风控/统计调查", jobs: "数据分析、数仓、风控、金融科技", postgradText: "读研增值明显，可转统计/计算机/金融科技", civilText: "统计、税务、数字政务可看" },
+  { match: /经济统计|统计学/, employment: 80, postgrad: 88, civil: 82, category: "考研考公友好", chips: ["统计方向", "考公友好"], source: "岗位：数据分析/统计调查/银行风控/税务财政", jobs: "数据分析、统计调查、银行风控、财政税务数据岗", postgradText: "读研可转统计、应用经济、金融工程、数据科学", civilText: "统计局、调查队、税务、财政岗位适配较好" },
+  { match: /金融数学|金融工程|精算|金融科技/, employment: 76, postgrad: 90, civil: 72, category: "财经数学", chips: ["数学要求高", "读研增值"], source: "岗位：银行风控/量化助理/金融科技/数据分析", jobs: "银行风控、金融科技、数据分析、量化助理；高端岗位偏硕士", postgradText: "读研增值很明显，可转金融工程、统计、应用经济", civilText: "税务、金融监管、财政和部分经济类岗位可看" },
+  { match: /金融学|投资学|保险学|信用管理/, employment: 70, postgrad: 78, civil: 76, category: "财经类", chips: ["财经类", "平台重要"], source: "岗位：银行/保险/证券/财富管理/风控运营", jobs: "银行、保险、证券、财富管理、风控运营；学校层次和实习影响较大", postgradText: "读研可提升金融机构和平台机会", civilText: "税务、财政、金融监管、银保监相关岗位可看" },
+  { match: /财政学|税收学/, employment: 76, postgrad: 78, civil: 88, category: "考公友好", chips: ["考公友好", "财经类"], source: "岗位：税务/财政/会计/审计/企事业财务", jobs: "税务、财政、企事业财务、审计、预算管理", postgradText: "读研可转财政税务、会计审计、公共管理", civilText: "税务、财政系统匹配度高，是考公友好方向" },
+  { match: /会计学|财务管理|审计学|资产评估/, employment: 78, postgrad: 72, civil: 82, category: "经管实用", chips: ["就业稳定", "考公友好"], source: "岗位：财务/审计/税务/会计/内控", jobs: "财务、审计、税务、会计、内控，岗位稳定但竞争人数多", postgradText: "考研或考证可提升平台，CPA/税务师等证书重要", civilText: "税务、审计、财政、事业单位财务岗匹配较好" },
+  { match: /工商管理|市场营销|人力资源|旅游管理|酒店管理|电子商务|物流管理|供应链/, employment: 64, postgrad: 65, civil: 58, category: "经管泛化", chips: ["本科出口较泛", "看实习"], source: "岗位：运营/销售/人事/市场/供应链/电商", jobs: "运营、销售、人事、市场、供应链、电商；本科出口较泛，实习影响大", postgradText: "读研可转管理、应用经济、公共管理，但增值取决于学校", civilText: "考公岗位有但限制不如法学、中文、计算机、财会明确" },
+  { match: /国际经济与贸易|贸易经济|商务英语/, employment: 66, postgrad: 68, civil: 55, category: "外贸商务", chips: ["看城市产业", "语言加分"], source: "岗位：外贸业务/跨境电商/商务运营/采购", jobs: "外贸业务、跨境电商、商务运营、采购；城市产业和英语能力很关键", postgradText: "可转国际商务、应用经济、翻译等方向", civilText: "海关、商务、税务等岗位可看，但数量有限" },
+  { match: /法学|知识产权/, employment: 72, postgrad: 82, civil: 92, category: "考公强", chips: ["考公强", "法考关键"], source: "岗位：公务员/法务/律师助理/知识产权", jobs: "公务员、法务、律师助理、知识产权；法考通过率和学校平台很重要", postgradText: "读研和法考均能明显提升平台", civilText: "公检法、司法、行政执法、市场监管等岗位适配强" },
+  { match: /汉语言文学|汉语国际教育|秘书学/, employment: 68, postgrad: 72, civil: 88, category: "考公友好", chips: ["考公友好", "文职适配"], source: "岗位：教师/文案/行政/新媒体/公务员", jobs: "教师、文案、行政、新媒体、出版编辑；岗位宽但薪资分化", postgradText: "可转中国语言文学、教育、新闻传播", civilText: "党政机关、宣传、综合管理、文秘岗位适配较好" },
+  { match: /新闻学|传播学|网络与新媒体|广告学|编辑出版/, employment: 66, postgrad: 68, civil: 70, category: "内容传播", chips: ["作品集重要", "平台分化"], source: "岗位：新媒体运营/内容编辑/品牌传播/广告策划", jobs: "新媒体运营、内容编辑、品牌传播、广告策划；作品和实习很重要", postgradText: "读研可提升媒体、品牌和研究岗位平台", civilText: "宣传、网信、综合文字岗位可看" },
+  { match: /英语|日语|法语|德语|西班牙语|翻译|外国语言文学/, employment: 62, postgrad: 68, civil: 62, category: "语言类", chips: ["语言能力关键", "需复合技能"], source: "岗位：外贸/翻译/教育/跨境电商/运营", jobs: "外贸、翻译、教育、跨境电商、运营；建议叠加法律、财经、计算机或外贸技能", postgradText: "读研可走翻译、语言文学、国际商务、教育", civilText: "外事、海关、商务、综合岗有机会但岗位有限" },
+  { match: /历史学|哲学|社会学|政治学|民族学|马克思主义|思想政治教育/, employment: 56, postgrad: 76, civil: 78, category: "人文社科", chips: ["读研/考公更适合", "本科就业弱"], source: "岗位：教师/行政/党务/研究/公务员", jobs: "教师、行政、党务、研究、文职；本科市场化就业偏弱", postgradText: "读研价值较高，适合高校、研究、教育或考公路线", civilText: "党政机关、综合管理、党务宣传等岗位可看" },
+  { match: /公共事业管理|行政管理|劳动与社会保障|土地资源管理|城市管理|公共管理/, employment: 60, postgrad: 70, civil: 82, category: "公共管理", chips: ["考公友好", "就业偏体制"], source: "岗位：行政/事业单位/社区治理/公共服务", jobs: "行政、事业单位、社区治理、公共服务；市场化就业一般", postgradText: "可转公共管理、社会保障、土地资源管理", civilText: "综合管理、民政、人社、自然资源等岗位适配较好" },
+  { match: /心理学|应用心理学/, employment: 60, postgrad: 82, civil: 62, category: "读研增值", chips: ["读研增值", "证书重要"], source: "岗位：心理咨询助理/用户研究/人力/教育", jobs: "心理咨询助理、用户研究、人力资源、教育；本科直接就业门槛较尴尬", postgradText: "读研增值明显，专硕/学硕方向影响就业", civilText: "教育、司法、公安、事业单位有少量岗位" },
+  { match: /教育学|小学教育|学前教育|特殊教育|科学教育/, employment: 68, postgrad: 74, civil: 76, category: "师范方向", chips: ["师范方向", "编制导向"], source: "岗位：教师/教研/教育机构/事业单位", jobs: "教师、教研、教育机构、教育产品；是否愿意当老师很关键", postgradText: "教育硕士和教师资格证提升稳定性", civilText: "教师编、事业单位和教育系统适配" },
   { match: /人工智能|智能科学/, employment: 74, postgrad: 92, civil: 58, category: "读研增值", chips: ["读研增值", "本科门槛高"], source: "岗位：算法/AI应用/数据/测试", jobs: "AI应用、数据、测试、开发，算法岗门槛高", postgradText: "强烈增值，硕士更适合算法/机器学习", civilText: "多按计算机类尝试，稳定性一般" },
   { match: /机器人工程/, employment: 78, postgrad: 82, civil: 45, category: "实践导向", chips: ["实践导向", "现场属性"], source: "岗位：PLC/机器人调试/机器视觉/系统集成", jobs: "PLC、机器人调试、机器视觉、系统集成", postgradText: "转控制/自动化/机器人方向提升上限", civilText: "考公岗位少" },
   { match: /机械设计|智能制造/, employment: 70, postgrad: 70, civil: 42, category: "现场属性", chips: ["制造业", "现场属性"], source: "岗位：机械设计/工艺/设备/非标自动化", jobs: "机械设计、工艺、设备、非标自动化", postgradText: "可转智能制造、机械电子、车辆/机器人", civilText: "岗位较少" },
@@ -52,6 +67,10 @@ const majorProfiles = [
   { match: /信息与计算科学|数学|金融数学/, employment: 68, postgrad: 86, civil: 66, category: "考研增值", chips: ["数学要求高", "考研增值"], source: "方向：数学+计算机/统计/金融数学", jobs: "需补编程，可走数据分析、开发或算法助理", postgradText: "适合转计算机、统计、金融数学", civilText: "数学/统计/部分信息化岗位可看" },
   { match: /师范|科学教育/, employment: 66, postgrad: 72, civil: 70, category: "师范方向", chips: ["师范方向"], source: "方向：教师编制/教育系统", jobs: "教师、教培、教育科技、教育系统", postgradText: "教育硕士或学科教学提升就业稳定性", civilText: "教师编、事业单位适配" },
   { match: /医学|护理|药学|中医/, employment: 68, postgrad: 78, civil: 68, category: "医学药学", chips: ["职业路径明确"], source: "方向：医疗卫生/药企/事业单位", jobs: "医疗卫生、药企、检验、医药代表", postgradText: "深造价值较高", civilText: "卫健系统和事业单位可看" },
+  { match: /临床医学|口腔医学|麻醉学|医学影像|医学检验|预防医学/, employment: 78, postgrad: 88, civil: 72, category: "医学类", chips: ["周期长", "职业明确"], source: "岗位：医院/卫健系统/医学检验/公共卫生", jobs: "医院、卫健系统、医学检验、公共卫生；培养周期长，读研规培常见", postgradText: "深造和规培对职业平台影响很大", civilText: "卫健系统、疾控、事业单位可看" },
+  { match: /建筑学|城乡规划|风景园林/, employment: 62, postgrad: 70, civil: 58, category: "设计规划", chips: ["行业周期", "作品/资质重要"], source: "岗位：建筑设计/规划设计/景观设计/地产设计", jobs: "建筑设计、规划设计、景观设计、地产设计；受行业周期影响", postgradText: "读研和作品集能提升设计院平台", civilText: "住建、自然资源、规划类岗位有限" },
+  { match: /土木工程|工程管理|工程造价|交通工程|给排水/, employment: 60, postgrad: 68, civil: 60, category: "传统工科", chips: ["行业周期", "现场属性"], source: "岗位：施工/造价/设计/项目管理", jobs: "施工、造价、设计、项目管理；现场属性强，行业周期影响大", postgradText: "读研可转结构、交通、市政、管理科学", civilText: "住建、交通、水利等岗位可看" },
+  { match: /农学|园艺|植物保护|林学|动物科学|动物医学|水产|海洋科学/, employment: 58, postgrad: 72, civil: 68, category: "农林海洋", chips: ["冷门方向", "考研/体制更适合"], source: "岗位：农业技术/检测/科研助理/基层农林系统", jobs: "农业技术、检测、科研助理、基层农林系统；市场化岗位偏窄", postgradText: "读研后科研院所、事业单位机会更好", civilText: "农业农村、自然资源、海洋渔业等岗位可看" },
 ];
 
 const headerAliases = {
@@ -117,12 +136,12 @@ function riskPenalty(row, prefs, majorProfile) {
   if (prefs.includes("highTuition") && (/中外|合作|高收费/.test(major) || Number(row.tuition) >= 15000)) penalty += 18;
   if (prefs.includes("fieldwork") && /机械|机器人|智能制造|自动化/.test(major)) penalty += 8;
   if (prefs.includes("researchDependent") && /人工智能|智能科学|信息与计算|数学|环境|金融数学/.test(major)) penalty += 10;
-  if (prefs.includes("unclearEmployment") && /人工智能|智能科学|金融数学|数字经济|管理科学/.test(major)) penalty += 8;
+  if (prefs.includes("unclearEmployment") && /人工智能|智能科学|金融数学|数字经济|管理科学|工商管理|市场营销|公共事业管理|行政管理|哲学|历史学|社会学|心理学/.test(major)) penalty += 8;
   if (prefs.includes("environment") && /环境|生物|食品|材料|化学/.test(major)) penalty += 18;
   if (prefs.includes("coldTraditional") && /农学|林学|海洋|水产|地质|矿业|纺织/.test(major)) penalty += 12;
   if (prefs.includes("teacher") && /师范|科学教育/.test(major)) penalty += 12;
   if (prefs.includes("medical") && /医学|护理|药学|中医/.test(major)) penalty += 12;
-  if (prefs.includes("mathHeavy") && /统计|数据科学|人工智能|数学|金融数学|信息与计算/.test(major)) penalty += 8;
+  if (prefs.includes("mathHeavy") && /统计|数据科学|人工智能|数学|金融数学|金融工程|精算|信息与计算/.test(major)) penalty += 8;
   if (prefs.includes("csCompetition") && /计算机|软件|人工智能/.test(major)) penalty += 5;
   if (majorProfile.category === "慎填") penalty += 8;
   if (needsPhysicsChemistry(major) && (!subjects.includes("物") || !subjects.includes("化"))) penalty += 28;
@@ -156,15 +175,15 @@ function analyzeRow(row) {
     text: "学校层次需进一步核对，先按普通本科处理。",
   });
   const majorProfile = getProfile(majorProfiles, row.major, {
-    employment: 62,
-    postgrad: 65,
-    civil: 55,
-    category: "待核",
-    chips: ["专业待核"],
+    employment: 60,
+    postgrad: 62,
+    civil: 58,
+    category: "通用专业",
+    chips: ["需人工核对"],
     source: "专业来源：待核",
-    jobs: "需结合课程、就业岗位和学校介绍核对",
-    postgradText: "需核对硕士方向",
-    civilText: "需核对职位表专业目录",
+    jobs: "当前规则库未完全覆盖该专业，需结合课程、学校介绍和招聘岗位核对",
+    postgradText: "需核对可衔接的硕士方向和学校培养口径",
+    civilText: "需核对国考/省考职位表专业目录",
   });
   const admission = admissionScore(row, rank);
   const weights = getGoalWeights(goal);
