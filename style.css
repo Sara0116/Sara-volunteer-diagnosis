@@ -201,6 +201,30 @@ select:focus {
   height: 16px;
 }
 
+.preference-card {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fff;
+}
+
+.preference-card strong {
+  color: var(--blue);
+  font-size: 13px;
+}
+
+.preference-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .upload-box {
   display: grid;
   min-height: 112px;
@@ -376,6 +400,10 @@ table {
   background: #fff;
 }
 
+#adjustedView table {
+  min-width: 2100px;
+}
+
 th,
 td {
   border-bottom: 1px solid var(--line);
@@ -409,6 +437,12 @@ td:nth-child(4) {
 .analysis-cell {
   text-align: left;
   vertical-align: top;
+}
+
+.concern-cell {
+  min-width: 220px;
+  color: #334155;
+  line-height: 1.55;
 }
 
 .admission-cell {
@@ -449,6 +483,10 @@ td:nth-child(4) {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.concern-chip-row {
+  justify-content: center;
 }
 
 .chip {
@@ -536,6 +574,24 @@ td:nth-child(4) {
 
 .highlight-row {
   background: var(--yellow-row);
+}
+
+.adjusted-note {
+  min-width: 280px;
+}
+
+.adjusted-note-stack {
+  display: grid;
+  gap: 6px;
+  line-height: 1.55;
+}
+
+.adjusted-note-stack strong {
+  color: var(--blue);
+}
+
+.adjusted-note-stack span {
+  color: #334155;
 }
 
 .source-grid {

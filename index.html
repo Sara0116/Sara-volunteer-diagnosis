@@ -56,28 +56,47 @@
         </section>
 
         <section class="panel-section">
-          <h2>不太接受</h2>
+          <h2>填报顾虑</h2>
           <div class="check-group">
-            <strong>填报偏好</strong>
+            <strong>降低优先级的情况</strong>
             <div class="check-list">
-              <label><input type="checkbox" value="outsideSchool" /> 省外学校</label>
-              <label><input type="checkbox" value="outsideSmallPlan" checked /> 省外小计划</label>
-              <label><input type="checkbox" value="highTuition" /> 高学费/中外合作</label>
-              <label><input type="checkbox" value="fieldwork" /> 工厂/现场属性强</label>
-              <label><input type="checkbox" value="researchDependent" /> 强依赖考研</label>
-              <label><input type="checkbox" value="unclearEmployment" checked /> 本科就业不清晰</label>
+              <label><input type="checkbox" data-pref-type="concern" value="outsideSchool" /> 省外学校</label>
+              <label><input type="checkbox" data-pref-type="concern" value="outsideSmallPlan" checked /> 省外招生计划很少</label>
+              <label><input type="checkbox" data-pref-type="concern" value="highTuition" /> 高学费/中外合作</label>
+              <label><input type="checkbox" data-pref-type="concern" value="fieldwork" /> 工作场景偏现场/制造</label>
+              <label><input type="checkbox" data-pref-type="concern" value="researchDependent" /> 读研后优势才明显</label>
+              <label><input type="checkbox" data-pref-type="concern" value="unclearEmployment" checked /> 本科出口较依赖实习/能力</label>
             </div>
           </div>
           <div class="check-group">
-            <strong>专业方向慎填</strong>
+            <strong>专业方向顾虑</strong>
             <div class="check-list">
-              <label><input type="checkbox" value="environment" checked /> 环境/生化/材料</label>
-              <label><input type="checkbox" value="coldTraditional" /> 农林海洋冷门</label>
-              <label><input type="checkbox" value="teacher" /> 师范方向</label>
-              <label><input type="checkbox" value="medical" /> 医学护理药学</label>
-              <label><input type="checkbox" value="mathHeavy" /> 数学要求高</label>
-              <label><input type="checkbox" value="csCompetition" /> 计算机高竞争</label>
+              <label><input type="checkbox" data-pref-type="concern" value="environment" checked /> 生化环材类</label>
+              <label><input type="checkbox" data-pref-type="concern" value="coldTraditional" /> 农林海洋偏冷门</label>
+              <label><input type="checkbox" data-pref-type="concern" value="teacher" /> 师范方向</label>
+              <label><input type="checkbox" data-pref-type="concern" value="medical" /> 医学/护理/药学</label>
+              <label><input type="checkbox" data-pref-type="concern" value="mathHeavy" /> 数学要求高</label>
+              <label><input type="checkbox" data-pref-type="concern" value="csCompetition" /> 计算机类竞争激烈</label>
             </div>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <h2>偏好方向</h2>
+          <div class="check-group">
+            <strong>更想优先考虑</strong>
+            <div class="check-list">
+              <label><input type="checkbox" data-pref-type="desired" value="zhejiang" checked /> 浙江省内优先</label>
+              <label><input type="checkbox" data-pref-type="desired" value="public" checked /> 公办/省重点优先</label>
+              <label><input type="checkbox" data-pref-type="desired" value="schoolTier" /> 更看重学校层次</label>
+              <label><input type="checkbox" data-pref-type="desired" value="majorCareer" checked /> 更看重专业就业</label>
+              <label><input type="checkbox" data-pref-type="desired" value="civilFriendly" /> 考公友好</label>
+              <label><input type="checkbox" data-pref-type="desired" value="postgradValue" /> 考研深造空间</label>
+            </div>
+          </div>
+          <div class="preference-card">
+            <strong>系统识别到的偏好</strong>
+            <div id="preferenceInsight" class="preference-tags">等待上传或诊断后生成</div>
           </div>
         </section>
 
@@ -165,20 +184,31 @@
           <div class="table-toolbar">
             <div>
               <h3>建议调整后排序</h3>
-              <p>黄色表示相对原表调整过顺序。排序按浙江规则和“更愿意被录取”原则处理。</p>
+              <p>按原表字段展示，黄色表示相对原表调整过顺序，后面补充录取参考、建议分和调整备注。</p>
             </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>调整序号</th>
+                  <th>建议序号</th>
                   <th>原序号</th>
                   <th>院校</th>
+                  <th>院校特色</th>
+                  <th>风险标签</th>
+                  <th>专业录取概率</th>
                   <th>专业</th>
+                  <th>计划</th>
+                  <th>学费</th>
+                  <th>学制</th>
+                  <th>录取人数</th>
+                  <th>最低分</th>
+                  <th>最低位次</th>
+                  <th>录取参考</th>
                   <th>建议分</th>
                   <th>标签</th>
-                  <th>排序备注</th>
+                  <th>慎填因素</th>
+                  <th>调整备注</th>
                 </tr>
               </thead>
               <tbody id="adjustedBody"></tbody>

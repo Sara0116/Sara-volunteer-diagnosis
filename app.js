@@ -82,6 +82,7 @@ const headerAliases = {
   major: ["专业", "专业名称"],
   plan: ["计划", "招生计划", "计划数"],
   tuition: ["学费"],
+  duration: ["学制"],
   admissionCount: ["录取人数", "人数"],
   minScore: ["最低分", "分数线"],
   minRank: ["最低位次", "位次"],
@@ -92,12 +93,31 @@ let analyzedRows = [];
 let workbookCache = null;
 let sheetAnalyses = [];
 
+const concernLabels = {
+  outsideSchool: "省外学校",
+  outsideSmallPlan: "省外招生计划很少",
+  highTuition: "高学费/中外合作",
+  fieldwork: "工作场景偏现场/制造",
+  researchDependent: "读研后优势才明显",
+  unclearEmployment: "本科出口较依赖实习/能力",
+  environment: "生化环材类",
+  coldTraditional: "农林海洋偏冷门",
+  teacher: "师范方向",
+  medical: "医学/护理/药学",
+  mathHeavy: "数学要求高",
+  csCompetition: "计算机类竞争激烈",
+};
+
 function getProfile(list, value, fallback) {
   return list.find((item) => item.match.test(value)) || fallback;
 }
 
 function getRejectedPrefs() {
-  return [...document.querySelectorAll(".check-list input:checked")].map((node) => node.value);
+  return [...document.querySelectorAll('input[data-pref-type="concern"]:checked')].map((node) => node.value);
+}
+
+function getDesiredPrefs() {
+  return [...document.querySelectorAll('input[data-pref-type="desired"]:checked')].map((node) => node.value);
 }
 
 function getGoalWeights(goal) {
@@ -216,29 +236,38 @@ function formatReferenceYears(years, rank) {
     .join("；");
 }
 
-function riskPenalty(row, prefs, majorProfile) {
-  let penalty = 0;
+function riskPenalty(row, prefs, majorProfile, schoolProfile) {
+  let total = 0;
+  const reasons = [];
   const subjects = document.querySelector("#subjectInput").value || "";
   const school = row.school || "";
   const major = row.major || "";
   const isOutsideZhejiang = !/浙江|温州|嘉兴|杭州|浙大|中国计量/.test(school);
 
-  if ((Number(row.plan) || 0) <= 2) penalty += 12;
-  if (prefs.includes("outsideSchool") && isOutsideZhejiang) penalty += 10;
-  if (prefs.includes("outsideSmallPlan") && isOutsideZhejiang && (Number(row.plan) || 0) <= 2) penalty += 12;
-  if (prefs.includes("highTuition") && (/中外|合作|高收费/.test(major) || Number(row.tuition) >= 15000)) penalty += 18;
-  if (prefs.includes("fieldwork") && /机械|机器人|智能制造|自动化/.test(major)) penalty += 8;
-  if (prefs.includes("researchDependent") && /人工智能|智能科学|信息与计算|数学|环境|金融数学/.test(major)) penalty += 10;
-  if (prefs.includes("unclearEmployment") && /人工智能|智能科学|金融数学|数字经济|管理科学|工商管理|市场营销|公共事业管理|行政管理|哲学|历史学|社会学|心理学/.test(major)) penalty += 8;
-  if (prefs.includes("environment") && /环境|生物|食品|材料|化学/.test(major)) penalty += 18;
-  if (prefs.includes("coldTraditional") && /农学|林学|海洋|水产|地质|矿业|纺织/.test(major)) penalty += 12;
-  if (prefs.includes("teacher") && /师范|科学教育/.test(major)) penalty += 12;
-  if (prefs.includes("medical") && /医学|护理|药学|中医/.test(major)) penalty += 12;
-  if (prefs.includes("mathHeavy") && /统计|数据科学|人工智能|数学|金融数学|金融工程|精算|信息与计算/.test(major)) penalty += 8;
-  if (prefs.includes("csCompetition") && /计算机|软件|人工智能/.test(major)) penalty += 5;
-  if (majorProfile.category === "慎填") penalty += 8;
-  if (needsPhysicsChemistry(major) && (!subjects.includes("物") || !subjects.includes("化"))) penalty += 28;
-  return penalty;
+  const add = (value, text) => {
+    total += value;
+    reasons.push({ value, text });
+  };
+
+  if ((Number(row.plan) || 0) <= 2) add(12, "招生计划≤2，年度波动可能较大");
+  if (prefs.includes("outsideSchool") && isOutsideZhejiang) add(10, `${concernLabels.outsideSchool}与当前顾虑不匹配`);
+  if (prefs.includes("outsideSmallPlan") && isOutsideZhejiang && (Number(row.plan) || 0) <= 2) add(12, `${concernLabels.outsideSmallPlan}，且为省外院校`);
+  if (prefs.includes("highTuition") && (/中外|合作|高收费/.test(major) || Number(row.tuition) >= 15000)) add(18, `${concernLabels.highTuition}，需确认家庭接受度`);
+  if (prefs.includes("fieldwork") && /机械|机器人|智能制造|自动化/.test(major)) add(8, `${concernLabels.fieldwork}，岗位可能偏设备/现场`);
+  if (prefs.includes("researchDependent") && /人工智能|智能科学|信息与计算|数学|环境|金融数学/.test(major)) add(10, `${concernLabels.researchDependent}，本科和硕士出口差异较大`);
+  if (prefs.includes("unclearEmployment") && /人工智能|智能科学|金融数学|数字经济|管理科学|工商管理|市场营销|公共事业管理|行政管理|哲学|历史学|社会学|心理学/.test(major)) {
+    const value = schoolProfile.score >= 75 && /人工智能|智能科学/.test(major) ? 4 : 8;
+    add(value, `${concernLabels.unclearEmployment}，需看课程、项目和实习质量`);
+  }
+  if (prefs.includes("environment") && /环境|生物|食品|材料|化学/.test(major)) add(18, `${concernLabels.environment}，市场化就业需谨慎`);
+  if (prefs.includes("coldTraditional") && /农学|林学|海洋|水产|地质|矿业|纺织/.test(major)) add(12, `${concernLabels.coldTraditional}，岗位面相对窄`);
+  if (prefs.includes("teacher") && /师范|科学教育/.test(major)) add(12, `${concernLabels.teacher}，需确认是否接受教师路线`);
+  if (prefs.includes("medical") && /医学|护理|药学|中医/.test(major)) add(12, `${concernLabels.medical}，培养周期和职业路径较特殊`);
+  if (prefs.includes("mathHeavy") && /统计|数据科学|人工智能|数学|金融数学|金融工程|精算|信息与计算/.test(major)) add(8, `${concernLabels.mathHeavy}，课程难度和转化门槛较高`);
+  if (prefs.includes("csCompetition") && /计算机|软件|人工智能/.test(major)) add(5, `${concernLabels.csCompetition}，需要项目和实习拉开差距`);
+  if (majorProfile.category === "慎填") add(8, "专业本身属于慎填方向，建议结合学校平台判断");
+  if (needsPhysicsChemistry(major) && (!subjects.includes("物") || !subjects.includes("化"))) add(28, "选科可能不满足物化要求，必须核对招生计划书");
+  return { total, reasons };
 }
 
 function needsPhysicsChemistry(major) {
@@ -256,10 +285,30 @@ function subjectResult(major) {
   return { text: `${subjects}；可能不满足物化要求，需重点核对`, tone: "danger" };
 }
 
+function preferenceScore(row, schoolProfile, majorProfile, desiredPrefs) {
+  const school = row.school || "";
+  const feature = row.feature || "";
+  const isZhejiang = /浙江|温州|嘉兴|杭州|浙大|中国计量/.test(school);
+  let score = 72;
+
+  if (desiredPrefs.includes("zhejiang")) score += isZhejiang ? 8 : -6;
+  if (desiredPrefs.includes("public")) {
+    if (/民办|独立|中外合作/.test(feature + row.major)) score -= 8;
+    else if (schoolProfile.score >= 68) score += 6;
+  }
+  if (desiredPrefs.includes("schoolTier")) score += (schoolProfile.score - 70) * 0.35;
+  if (desiredPrefs.includes("majorCareer")) score += (majorProfile.employment - 70) * 0.35;
+  if (desiredPrefs.includes("civilFriendly")) score += (majorProfile.civil - 70) * 0.3;
+  if (desiredPrefs.includes("postgradValue")) score += (majorProfile.postgrad - 70) * 0.3;
+
+  return Math.round(clamp(score, 45, 96));
+}
+
 function analyzeRow(row) {
   const rank = Number(document.querySelector("#rankInput").value) || 62895;
   const goal = document.querySelector("#goalInput").value;
   const prefs = getRejectedPrefs();
+  const desiredPrefs = getDesiredPrefs();
   const schoolProfile = getProfile(schoolProfiles, row.school, {
     score: 62,
     level: "待核",
@@ -281,8 +330,9 @@ function analyzeRow(row) {
   const reference = getAdmissionReference(row, rank);
   const admission = reference.score;
   const weights = getGoalWeights(goal);
-  const preference = 82;
-  const penalty = riskPenalty(row, prefs, majorProfile);
+  const preference = preferenceScore(row, schoolProfile, majorProfile, desiredPrefs);
+  const penaltyInfo = riskPenalty(row, prefs, majorProfile, schoolProfile);
+  const penalty = penaltyInfo.total;
   const score =
     admission * weights.admission +
     schoolProfile.score * weights.school +
@@ -302,7 +352,7 @@ function analyzeRow(row) {
     { text: tag, tone: tag === "慎填" ? "danger" : tag === "后移" ? "warn" : "good" },
   ];
   if ((Number(row.plan) || 0) <= 2) chips.push({ text: "小计划风险", tone: "danger" });
-  if (penalty > 0) chips.push({ text: `风险扣分 ${penalty}`, tone: penalty >= 18 ? "danger" : "warn" });
+  if (penalty > 0) chips.push({ text: `慎填因素 ${penalty}`, tone: penalty >= 18 ? "danger" : "warn" });
 
   return {
     ...row,
@@ -311,6 +361,7 @@ function analyzeRow(row) {
     sortScore,
     tag,
     penalty,
+    penaltyReasons: penaltyInfo.reasons,
     chips,
     analysisParts: {
       school: `${schoolProfile.level}；${schoolProfile.text}`,
@@ -320,6 +371,7 @@ function analyzeRow(row) {
       civil: majorProfile.civilText,
       subject: subject.text,
       subjectTone: subject.tone,
+      concerns: penaltyInfo.reasons.length ? penaltyInfo.reasons.map((item) => `${item.text}（${item.value}）`).join("；") : "无明显慎填因素",
       advice: `${finalScore}分，${tag}`,
     },
     analysis: `${schoolProfile.text} 录取：${reference.detail}，${reference.trend}。就业：${majorProfile.jobs}。考研：${majorProfile.postgradText}。考公：${majorProfile.civilText}。选科：${subject.text}。建议：${finalScore}分，${tag}。`,
@@ -400,6 +452,7 @@ function renderAnalysis(row) {
       ${analysisLine("考研", part.postgrad)}
       ${analysisLine("考公", part.civil)}
       ${analysisLine("选科", part.subject, part.subjectTone)}
+      ${analysisLine("慎填", part.concerns, row.penalty >= 18 ? "danger" : row.penalty > 0 ? "warn" : "")}
       ${analysisLine("建议", part.advice)}
     </div>
   `;
@@ -436,33 +489,90 @@ function renderAdjusted(rows) {
   document.querySelector("#adjustedBody").innerHTML = adjusted
     .map((row, index) => {
       const changed = Number(row.order) !== index + 1;
-      const reasons = [
-        `建议分 ${row.score}`,
-        `排序分 ${row.sortScore}`,
-        `录取${row.reference?.level || row.risk || "待核"}`,
-        `标签 ${row.tag}`,
-        row.analysisParts.jobs,
-        row.penalty ? `风险扣分 ${row.penalty}` : "无明显偏好扣分",
-      ];
       return `
         <tr class="${changed ? "highlight-row" : ""}">
           <td>${index + 1}</td>
           <td>${escapeText(row.order)}</td>
           <td>${escapeText(row.school)}</td>
+          <td>${escapeText(row.feature)}</td>
+          <td>${escapeText(row.risk)}</td>
+          <td>${escapeText(row.probability)}</td>
           <td>${escapeText(row.major)}</td>
+          <td>${escapeText(row.plan)}</td>
+          <td>${escapeText(row.tuition)}</td>
+          <td>${escapeText(row.duration || 4)}</td>
+          <td>${escapeText(row.admissionCount)}</td>
+          <td>${escapeText(row.minScore)}</td>
+          <td>${escapeText(row.minRank)}</td>
+          <td class="admission-cell">${renderAdmission(row)}</td>
           <td><span class="score-pill">${row.score}</span></td>
           <td><span class="tag-pill ${tagClass(row.tag)}">${row.tag}</span></td>
-          <td class="analysis-cell">
-            <div class="analysis-stack">
-              <div class="chip-row">${reasons.map((reason) => `<span class="chip ${row.tag === "慎填" ? "danger" : ""}">${escapeText(reason)}</span>`).join("")}</div>
-              ${analysisLine("调整", changed ? `原序号 ${row.order} 调整到 ${index + 1}` : "原位置基本合理")}
-              ${analysisLine("原因", "按浙江专业平行志愿规则，优先放更愿意被录取且综合价值更高的院校专业。")}
-            </div>
-          </td>
+          <td class="concern-cell">${renderConcernFactors(row)}</td>
+          <td class="analysis-cell adjusted-note">${renderAdjustmentNote(row, index, changed)}</td>
         </tr>
       `;
     })
     .join("");
+}
+
+function renderConcernFactors(row) {
+  if (!row.penaltyReasons?.length) return `<span class="chip good">无明显慎填因素</span>`;
+  return `
+    <div class="chip-row concern-chip-row">
+      ${row.penaltyReasons.map((item) => `<span class="chip ${item.value >= 18 ? "danger" : "warn"}">${escapeText(item.text)} +${item.value}</span>`).join("")}
+    </div>
+  `;
+}
+
+function renderAdjustmentNote(row, index, changed) {
+  const movement = changed ? `原序号 ${row.order} 调整到 ${index + 1}` : "原位置基本合理";
+  const factors = [
+    `排序分 ${row.sortScore}`,
+    `录取${row.reference?.level || row.risk || "待核"}`,
+    `学校/就业/考公考研综合判断`,
+  ];
+  if (row.penalty > 0) factors.push(`慎填因素 ${row.penalty}`);
+  return `
+    <div class="adjusted-note-stack">
+      <strong>${escapeText(movement)}</strong>
+      <span>${escapeText(factors.join("；"))}</span>
+    </div>
+  `;
+}
+
+function updatePreferenceInsight(rows) {
+  const target = document.querySelector("#preferenceInsight");
+  if (!target) return;
+  if (!rows.length) {
+    target.textContent = "等待上传或诊断后生成";
+    return;
+  }
+
+  const total = rows.length;
+  const count = (tester) => rows.filter(tester).length;
+  const provinceCount = count((row) => /浙江|温州|嘉兴|杭州|浙大|中国计量/.test(row.school || ""));
+  const strongSchoolCount = count((row) => getProfile(schoolProfiles, row.school, { score: 62 }).score >= 73);
+  const publicCount = count((row) => !/民办|独立|中外合作/.test(`${row.feature || ""}${row.major || ""}`));
+  const csDataCount = count((row) => /计算机|软件|数据科学|大数据|人工智能|智能科学/.test(row.major || ""));
+  const financeCount = count((row) => /财经|金融|统计|会计|财务|审计|税收|财政/.test(`${row.school || ""}${row.major || ""}`));
+  const electricCount = count((row) => /电气|自动化|电子信息|通信|机器人|智能制造/.test(row.major || ""));
+  const rushCount = count((row) => /冲/.test(row.risk || ""));
+  const smallPlanCount = count((row) => Number(row.plan) > 0 && Number(row.plan) <= 2);
+
+  const tags = [];
+  const addTag = (text, tone = "source") => tags.push({ text, tone });
+  if (provinceCount / total >= 0.65) addTag(`省内倾向明显 ${provinceCount}/${total}`, "good");
+  else if (provinceCount / total <= 0.35) addTag(`省外接受度较高 ${total - provinceCount}/${total}`, "warn");
+  if (publicCount / total >= 0.8) addTag("公办/非高费倾向明显", "good");
+  if (strongSchoolCount / total >= 0.5) addTag("较看重学校层次", "good");
+  if (csDataCount / total >= 0.35) addTag("计算机/数据方向集中", "source");
+  if (financeCount / total >= 0.25) addTag("财经/统计/财会方向较多", "source");
+  if (electricCount / total >= 0.25) addTag("电气/自动化/电子信息方向较多", "source");
+  if (rushCount / total >= 0.45) addTag("冲刺比例偏高", "warn");
+  if (smallPlanCount / total >= 0.2) addTag("小计划志愿较多", "warn");
+  if (!tags.length) addTag("偏好较分散，建议人工确认优先级", "warn");
+
+  target.innerHTML = tags.map((tag) => `<span class="chip ${tag.tone}">${escapeText(tag.text)}</span>`).join("");
 }
 
 function updateSummary(rows) {
@@ -473,6 +583,7 @@ function updateSummary(rows) {
   document.querySelector("#averageScore").textContent = average || "--";
   document.querySelector("#changedCount").textContent = adjusted;
   document.querySelector("#cautionCount").textContent = caution;
+  updatePreferenceInsight(rows);
 }
 
 function runAnalysis() {
@@ -496,6 +607,7 @@ function normalizeRow(raw, index, fieldMap) {
     major: String(get("major") || "").trim(),
     plan: toNumber(get("plan")) || "",
     tuition: toNumber(get("tuition")) || "",
+    duration: toNumber(get("duration")) || "",
     admissionCount: toNumber(get("admissionCount")) || "",
     minScore: toNumber(get("minScore")) || "",
     minRank: toNumber(get("minRank")) || "",
@@ -635,14 +747,20 @@ function exportReport() {
   const originalSheet = analyzedRows.map((row) => ({
     原序号: row.order,
     院校: row.school,
-    专业: row.major,
+    院校特色: row.feature,
     风险标签: row.risk,
+    专业录取概率: row.probability,
+    专业: row.major,
     计划: row.plan,
+    学费: row.tuition,
+    学制: row.duration || 4,
+    录取人数: row.admissionCount,
     最低分: row.minScore,
     最低位次: row.minRank,
     "录取参考": row.analysisParts.admission,
     综合建议分: row.score,
     调整标签: row.tag,
+    慎填因素: row.analysisParts.concerns,
     学校层次: row.analysisParts.school,
     就业: row.analysisParts.jobs,
     考研: row.analysisParts.postgrad,
@@ -651,12 +769,23 @@ function exportReport() {
     主要来源: row.sources,
   }));
   const adjustedSheet = sortForZhejiang(analyzedRows).map((row, index) => ({
-    调整序号: index + 1,
+    建议序号: index + 1,
     原序号: row.order,
     院校: row.school,
+    院校特色: row.feature,
+    风险标签: row.risk,
+    专业录取概率: row.probability,
     专业: row.major,
+    计划: row.plan,
+    学费: row.tuition,
+    学制: row.duration || 4,
+    录取人数: row.admissionCount,
+    最低分: row.minScore,
+    最低位次: row.minRank,
+    录取参考: row.analysisParts.admission,
     综合建议分: row.score,
     调整标签: row.tag,
+    慎填因素: row.analysisParts.concerns,
     排序备注:
       Number(row.order) === index + 1
         ? "原位置基本合理。"
