@@ -109,6 +109,7 @@ function getGoalWeights(goal) {
 }
 
 function admissionScore(row, rank) {
+  if (row.reference?.score) return row.reference.score;
   const minRank = Number(row.minRank) || rank;
   const diff = minRank - rank;
   let score = 50;
@@ -121,6 +122,87 @@ function admissionScore(row, rank) {
   else score = 94;
   if ((Number(row.plan) || 0) <= 2) score -= 14;
   return clamp(score, 10, 100);
+}
+
+function normalizeKey(value) {
+  return String(value ?? "")
+    .replace(/\s+/g, "")
+    .replaceAll("（", "(")
+    .replaceAll("）", ")")
+    .replace(/\(.*?\)/g, "")
+    .trim();
+}
+
+function getRankReference(row) {
+  const ref = window.RANK_REFERENCE || {};
+  const key = `${normalizeKey(row.school)}|${normalizeKey(row.major)}`;
+  const item = ref[key];
+  if (!item) return null;
+  return item;
+}
+
+function getAdmissionReference(row, rank) {
+  const item = getRankReference(row);
+  const years = [];
+  if (item?.y2024?.rank) years.push({ year: 2024, ...item.y2024 });
+  if (item?.y2025?.rank) years.push({ year: 2025, ...item.y2025 });
+  if (!years.length) {
+    const fallbackRank = Number(row.minRank) || 0;
+    const fallbackScore = Number(row.minScore) || 0;
+    return {
+      years: fallbackRank ? [{ year: 2025, rank: fallbackRank, score: fallbackScore, plan: Number(row.plan) || 0 }] : [],
+      score: admissionScoreFromRanks([{ rank: fallbackRank, plan: Number(row.plan) || 0 }], rank),
+      trend: "仅表内数据",
+      detail: fallbackRank ? `2025表内位次${fallbackRank}` : "缺少历史位次",
+      source: "上传表格",
+    };
+  }
+  const score = admissionScoreFromRanks(years, rank);
+  const y2024 = years.find((year) => year.year === 2024);
+  const y2025 = years.find((year) => year.year === 2025);
+  let trend = "两年参考";
+  if (y2024 && y2025) {
+    const rankChange = y2025.rank - y2024.rank;
+    if (rankChange < -2500) trend = "位次上升，竞争变强";
+    else if (rankChange > 2500) trend = "位次下降，录取变宽";
+    else trend = "两年较稳定";
+  }
+  return {
+    years,
+    score,
+    trend,
+    detail: formatReferenceYears(years, rank),
+    source: "2024/2025浙江考试院投档线",
+  };
+}
+
+function admissionScoreFromRanks(years, rank) {
+  const validYears = years.filter((year) => Number(year.rank));
+  if (!validYears.length) return 45;
+  const diffs = validYears.map((year) => year.rank - rank);
+  const avgDiff = diffs.reduce((sum, diff) => sum + diff, 0) / diffs.length;
+  const worstDiff = Math.min(...diffs);
+  let score = 50;
+  if (avgDiff < -9000) score = 25;
+  else if (avgDiff < -5000) score = 38;
+  else if (avgDiff < -1200) score = 54;
+  else if (avgDiff < 1500) score = 68;
+  else if (avgDiff < 7000) score = 78;
+  else if (avgDiff < 15000) score = 88;
+  else score = 94;
+  if (worstDiff < -5000) score -= 6;
+  if (validYears.some((year) => Number(year.plan) > 0 && Number(year.plan) <= 2)) score -= 10;
+  return clamp(score, 10, 98);
+}
+
+function formatReferenceYears(years, rank) {
+  return years
+    .map((year) => {
+      const diff = year.rank - rank;
+      const diffText = diff >= 0 ? `宽${diff}` : `高${Math.abs(diff)}`;
+      return `${year.year}：${year.score}分/${year.rank}位（${diffText}位）`;
+    })
+    .join("；");
 }
 
 function riskPenalty(row, prefs, majorProfile) {
@@ -185,7 +267,8 @@ function analyzeRow(row) {
     postgradText: "需核对可衔接的硕士方向和学校培养口径",
     civilText: "需核对国考/省考职位表专业目录",
   });
-  const admission = admissionScore(row, rank);
+  const reference = getAdmissionReference(row, rank);
+  const admission = reference.score;
   const weights = getGoalWeights(goal);
   const preference = 82;
   const penalty = riskPenalty(row, prefs, majorProfile);
@@ -211,12 +294,14 @@ function analyzeRow(row) {
 
   return {
     ...row,
+    reference,
     score: finalScore,
     tag,
     penalty,
     chips,
     analysisParts: {
       school: `${schoolProfile.level}；${schoolProfile.text}`,
+      admission: `${reference.detail}；${reference.trend}`,
       jobs: majorProfile.jobs,
       postgrad: majorProfile.postgradText,
       civil: majorProfile.civilText,
@@ -224,8 +309,8 @@ function analyzeRow(row) {
       subjectTone: subject.tone,
       advice: `${finalScore}分，${tag}`,
     },
-    analysis: `${schoolProfile.text} 就业：${majorProfile.jobs}。考研：${majorProfile.postgradText}。考公：${majorProfile.civilText}。选科：${subject.text}。建议：${finalScore}分，${tag}。`,
-    sources: `浙江考试院；招生计划书选考要求；${schoolProfile.source}；${majorProfile.source}；国考/省考职位表；Boss岗位关键词。`,
+    analysis: `${schoolProfile.text} 录取：${reference.detail}，${reference.trend}。就业：${majorProfile.jobs}。考研：${majorProfile.postgradText}。考公：${majorProfile.civilText}。选科：${subject.text}。建议：${finalScore}分，${tag}。`,
+    sources: `${reference.source}；招生计划书选考要求；${schoolProfile.source}；${majorProfile.source}；国考/省考职位表；Boss岗位关键词。`,
   };
 }
 
@@ -277,6 +362,7 @@ function renderAnalysis(row) {
     <div class="analysis-stack">
       <div class="chip-row">${row.chips.map((chip) => `<span class="chip ${chip.tone}">${escapeText(chip.text)}</span>`).join("")}</div>
       ${analysisLine("学校", part.school)}
+      ${analysisLine("录取", part.admission)}
       ${analysisLine("就业", part.jobs)}
       ${analysisLine("考研", part.postgrad)}
       ${analysisLine("考公", part.civil)}
@@ -505,6 +591,7 @@ function exportReport() {
     计划: row.plan,
     最低分: row.minScore,
     最低位次: row.minRank,
+    "2024/2025录取参考": row.analysisParts.admission,
     综合建议分: row.score,
     调整标签: row.tag,
     学校层次: row.analysisParts.school,
