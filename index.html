@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>志愿填报诊断原型</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script src="./vendor/xlsx.full.min.js"></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar">
+        <header class="brand">
+          <div class="brand-mark">诊</div>
+          <div>
+            <h1>志愿诊断</h1>
+            <p>浙江专业平行志愿 · 综合建议分</p>
+          </div>
+        </header>
+
+        <section class="panel-section">
+          <h2>考生信息</h2>
+          <div class="field-grid">
+            <label>
+              分数
+              <input id="scoreInput" type="number" value="592" />
+            </label>
+            <label>
+              位次
+              <input id="rankInput" type="number" value="62895" />
+            </label>
+            <label>
+              选科
+              <input id="subjectInput" type="text" value="物化政" />
+            </label>
+            <label>
+              目标偏好
+              <select id="goalInput">
+                <option value="balanced">综合平衡</option>
+                <option value="employment">就业优先</option>
+                <option value="postgraduate">考研优先</option>
+                <option value="civil">考公优先</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <h2>不太接受</h2>
+          <div class="check-list">
+            <label><input type="checkbox" value="environment" checked /> 环境类前置</label>
+            <label><input type="checkbox" value="fieldwork" /> 工厂/现场属性强</label>
+            <label><input type="checkbox" value="outsideSmallPlan" checked /> 省外小计划</label>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <h2>上传志愿表</h2>
+          <label class="upload-box" for="fileInput">
+            <input id="fileInput" type="file" accept=".xlsx,.xls" />
+            <strong id="fileLabel">选择 Excel 文件</strong>
+            <span>不上传也可以先用示例数据体验</span>
+          </label>
+          <div class="button-row">
+            <button id="analyzeButton" type="button">开始诊断</button>
+            <button id="exportButton" type="button" class="secondary">导出 Excel</button>
+          </div>
+        </section>
+
+        <section class="rule-box">
+          <h2>浙江排序规则</h2>
+          <p>1所院校+1个专业为1个志愿，按顺序逐个检索。前面投档成功后，后面志愿不再检索。所以排序要看“是否愿意被录取”，不是把最稳的简单放前面。</p>
+        </section>
+      </aside>
+
+      <section class="content">
+        <header class="summary">
+          <div>
+            <span class="eyebrow">诊断总览</span>
+            <h2 id="summaryTitle">等待诊断</h2>
+          </div>
+          <div class="metric-grid">
+            <article>
+              <strong id="averageScore">--</strong>
+              <span>平均建议分</span>
+            </article>
+            <article>
+              <strong id="changedCount">--</strong>
+              <span>排序调整</span>
+            </article>
+            <article>
+              <strong id="cautionCount">--</strong>
+              <span>慎填项</span>
+            </article>
+          </div>
+        </header>
+
+        <nav class="tabs" aria-label="诊断视图">
+          <button class="tab active" data-tab="original" type="button">原表分析</button>
+          <button class="tab" data-tab="adjusted" type="button">建议排序</button>
+          <button class="tab" data-tab="sources" type="button">来源依据</button>
+        </nav>
+
+        <section id="originalView" class="view active-view">
+          <div class="table-toolbar">
+            <div>
+              <h3>原表 + 综合诊断</h3>
+              <p>保留原志愿顺序，给出学校层次、就业、考公考研和综合建议分。</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>序号</th>
+                  <th>院校</th>
+                  <th>专业</th>
+                  <th>风险</th>
+                  <th>建议分</th>
+                  <th>标签</th>
+                  <th>分析</th>
+                  <th>来源</th>
+                </tr>
+              </thead>
+              <tbody id="originalBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="adjustedView" class="view">
+          <div class="table-toolbar">
+            <div>
+              <h3>建议调整后排序</h3>
+              <p>黄色表示相对原表调整过顺序。排序按浙江规则和“更愿意被录取”原则处理。</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>调整序号</th>
+                  <th>原序号</th>
+                  <th>院校</th>
+                  <th>专业</th>
+                  <th>建议分</th>
+                  <th>标签</th>
+                  <th>排序备注</th>
+                </tr>
+              </thead>
+              <tbody id="adjustedBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="sourcesView" class="view">
+          <div class="source-grid">
+            <article>
+              <h3>A 级：招录与规则</h3>
+              <p>浙江省教育考试院历年普通类投档线、招生计划和志愿填报规则。用于录取可能性、冲稳保和浙江排序规则判断。</p>
+            </article>
+            <article>
+              <h3>A/B 级：学校层次</h3>
+              <p>教育部双一流名单、学校官网、省重点建设信息、推免资格信息。用于判断学校平台、行业特色和考研资源。</p>
+            </article>
+            <article>
+              <h3>A/B 级：专业方向</h3>
+              <p>阳光高考专业库、教育部本科专业目录、高校学院专业介绍。用于课程、就业方向和考研方向解释。</p>
+            </article>
+            <article>
+              <h3>C 级：就业热度</h3>
+              <p>Boss直聘等招聘平台岗位关键词热度，如 Java、数据分析、电气工程师、PLC、嵌入式、算法工程师。用于岗位热度参考，不作为录取依据。</p>
+            </article>
+            <article>
+              <h3>A 级：考公参考</h3>
+              <p>国考、省考职位表中的专业要求。用于判断计算机、统计、电子信息、环境等专业在考公中的匹配度。</p>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
