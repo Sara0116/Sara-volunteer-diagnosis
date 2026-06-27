@@ -152,6 +152,7 @@ function getAdmissionReference(row, rank) {
     return {
       years: fallbackRank ? [{ year: 2025, rank: fallbackRank, score: fallbackScore, plan: Number(row.plan) || 0 }] : [],
       score: admissionScoreFromRanks([{ rank: fallbackRank, plan: Number(row.plan) || 0 }], rank),
+      level: admissionLevel([{ rank: fallbackRank }], rank),
       trend: "仅表内数据",
       detail: fallbackRank ? `2025表内位次${fallbackRank}` : "缺少历史位次",
       source: "上传表格",
@@ -170,10 +171,20 @@ function getAdmissionReference(row, rank) {
   return {
     years,
     score,
+    level: admissionLevel(years, rank),
     trend,
     detail: formatReferenceYears(years, rank),
     source: "2024/2025浙江考试院投档线",
   };
+}
+
+function admissionLevel(years, rank) {
+  const validYears = years.filter((year) => Number(year.rank));
+  if (!validYears.length) return "待核";
+  const avgDiff = validYears.reduce((sum, year) => sum + (year.rank - rank), 0) / validYears.length;
+  if (avgDiff < -1200) return "冲";
+  if (avgDiff <= 9000) return "稳";
+  return "保";
 }
 
 function admissionScoreFromRanks(years, rank) {
@@ -283,6 +294,7 @@ function analyzeRow(row) {
   const finalScore = Math.round(clamp(score, 20, 98));
   const tag = getTag(finalScore, penalty);
   const subject = subjectResult(row.major);
+  const sortScore = placementScore({ row, reference, admission, schoolProfile, majorProfile, preference, penalty });
   const chips = [
     { text: schoolProfile.chip, tone: "source" },
     ...majorProfile.chips.map((text) => ({ text, tone: chipTone(text) })),
@@ -296,6 +308,7 @@ function analyzeRow(row) {
     ...row,
     reference,
     score: finalScore,
+    sortScore,
     tag,
     penalty,
     chips,
@@ -314,6 +327,26 @@ function analyzeRow(row) {
   };
 }
 
+function placementScore({ row, reference, admission, schoolProfile, majorProfile, preference, penalty }) {
+  let score =
+    schoolProfile.score * 0.42 +
+    majorProfile.employment * 0.28 +
+    majorProfile.postgrad * 0.1 +
+    majorProfile.civil * 0.08 +
+    preference * 0.07 +
+    admission * 0.05 -
+    penalty;
+
+  const risk = String(row.risk || "");
+  const admissionRisk = reference?.level || risk;
+  if (schoolProfile.score <= 68 && admissionRisk.includes("保")) score -= 12;
+  if (schoolProfile.score <= 65 && admissionRisk.includes("保")) score -= 6;
+  if (schoolProfile.score <= 68 && /机械|机器人|环境|土木|管理|市场营销/.test(row.major || "")) score -= 8;
+  if ((Number(row.plan) || 0) <= 2) score -= 10;
+
+  return Math.round(clamp(score, 20, 98));
+}
+
 function chipTone(text) {
   if (/强|友好|稳|增值|特色|数据/.test(text)) return "good";
   if (/慎填|门槛|现场|要求高|待核/.test(text)) return "warn";
@@ -330,8 +363,8 @@ function getTag(score, penalty) {
 function sortForZhejiang(rows) {
   const tagBoost = { 前移: 8, 保留: 0, 后移: -8, 慎填: -22 };
   return [...rows].sort((a, b) => {
-    const aValue = a.score + tagBoost[a.tag];
-    const bValue = b.score + tagBoost[b.tag];
+    const aValue = (a.sortScore ?? a.score) + tagBoost[a.tag];
+    const bValue = (b.sortScore ?? b.score) + tagBoost[b.tag];
     if (bValue !== aValue) return bValue - aValue;
     return Number(a.order) - Number(b.order);
   });
@@ -379,6 +412,7 @@ function renderAdmission(row) {
   }
   return `
     <div class="admission-stack">
+      <span class="tag-pill ${tagClass(reference.level)}">${escapeText(reference.level)}</span>
       <span class="chip source">${escapeText(reference.trend)}</span>
       ${reference.years.map((year) => `<div><strong>${year.year}</strong> ${year.score}分 / ${year.rank}位</div>`).join("")}
     </div>
@@ -404,6 +438,8 @@ function renderAdjusted(rows) {
       const changed = Number(row.order) !== index + 1;
       const reasons = [
         `建议分 ${row.score}`,
+        `排序分 ${row.sortScore}`,
+        `录取${row.reference?.level || row.risk || "待核"}`,
         `标签 ${row.tag}`,
         row.analysisParts.jobs,
         row.penalty ? `风险扣分 ${row.penalty}` : "无明显偏好扣分",
@@ -633,6 +669,9 @@ function exportReport() {
 }
 
 function tagClass(tag) {
+  if (tag === "冲") return "caution";
+  if (tag === "稳") return "forward";
+  if (tag === "保") return "";
   if (tag === "前移") return "forward";
   if (tag === "后移") return "backward";
   if (tag === "慎填") return "caution";
