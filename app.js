@@ -348,6 +348,7 @@ function renderOriginal(rows) {
           <td>${escapeText(row.risk)}</td>
           <td><span class="score-pill">${row.score}</span></td>
           <td><span class="tag-pill ${tagClass(row.tag)}">${row.tag}</span></td>
+          <td class="admission-cell">${renderAdmission(row)}</td>
           <td class="analysis-cell">${renderAnalysis(row)}</td>
           <td class="source-cell">${renderSources(row.sources)}</td>
         </tr>
@@ -362,12 +363,24 @@ function renderAnalysis(row) {
     <div class="analysis-stack">
       <div class="chip-row">${row.chips.map((chip) => `<span class="chip ${chip.tone}">${escapeText(chip.text)}</span>`).join("")}</div>
       ${analysisLine("学校", part.school)}
-      ${analysisLine("录取", part.admission)}
       ${analysisLine("就业", part.jobs)}
       ${analysisLine("考研", part.postgrad)}
       ${analysisLine("考公", part.civil)}
       ${analysisLine("选科", part.subject, part.subjectTone)}
       ${analysisLine("建议", part.advice)}
+    </div>
+  `;
+}
+
+function renderAdmission(row) {
+  const reference = row.reference;
+  if (!reference?.years?.length) {
+    return `<div class="admission-stack"><span class="chip warn">缺少历史数据</span><small>需人工核对招生计划</small></div>`;
+  }
+  return `
+    <div class="admission-stack">
+      <span class="chip source">${escapeText(reference.trend)}</span>
+      ${reference.years.map((year) => `<div><strong>${year.year}</strong> ${year.score}分 / ${year.rank}位</div>`).join("")}
     </div>
   `;
 }
@@ -591,7 +604,7 @@ function exportReport() {
     计划: row.plan,
     最低分: row.minScore,
     最低位次: row.minRank,
-    "2024/2025录取参考": row.analysisParts.admission,
+    "录取参考": row.analysisParts.admission,
     综合建议分: row.score,
     调整标签: row.tag,
     学校层次: row.analysisParts.school,

@@ -371,7 +371,7 @@ select:focus {
 
 table {
   width: 100%;
-  min-width: 1040px;
+  min-width: 1180px;
   border-collapse: collapse;
   background: #fff;
 }
@@ -380,8 +380,8 @@ th,
 td {
   border-bottom: 1px solid var(--line);
   padding: 10px;
-  text-align: left;
-  vertical-align: top;
+  text-align: center;
+  vertical-align: middle;
   font-size: 13px;
 }
 
@@ -404,6 +404,27 @@ td:nth-child(4) {
 .source-cell {
   color: #334155;
   line-height: 1.58;
+}
+
+.analysis-cell {
+  text-align: left;
+  vertical-align: top;
+}
+
+.admission-cell {
+  min-width: 150px;
+  color: #334155;
+  line-height: 1.55;
+}
+
+.admission-stack {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+
+.admission-stack small {
+  color: var(--muted);
 }
 
 .analysis-stack {
