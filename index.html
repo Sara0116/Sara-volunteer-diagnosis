@@ -152,10 +152,42 @@
         </header>
 
         <nav class="tabs" aria-label="诊断视图">
+          <button class="tab" data-tab="preview" type="button">Excel预览</button>
           <button class="tab active" data-tab="original" type="button">原表分析</button>
           <button class="tab" data-tab="adjusted" type="button">建议排序</button>
           <button class="tab" data-tab="sources" type="button">来源依据</button>
         </nav>
+
+        <section id="previewView" class="view">
+          <div class="table-toolbar">
+            <div>
+              <h3>Excel 解析预览</h3>
+              <p id="previewMeta">上传后显示系统识别到的工作表、表头和前 30 条志愿。</p>
+            </div>
+          </div>
+          <div id="previewFieldMap" class="field-map-row"></div>
+          <div class="table-wrap preview-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>序号</th>
+                  <th>院校</th>
+                  <th>院校特色</th>
+                  <th>风险标签</th>
+                  <th>专业录取概率</th>
+                  <th>专业</th>
+                  <th>计划</th>
+                  <th>学费</th>
+                  <th>学制</th>
+                  <th>录取人数</th>
+                  <th>最低分</th>
+                  <th>最低位次</th>
+                </tr>
+              </thead>
+              <tbody id="previewBody"></tbody>
+            </table>
+          </div>
+        </section>
 
         <section id="originalView" class="view active-view">
           <div class="table-toolbar">

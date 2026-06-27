@@ -641,6 +641,12 @@ function resetDiagnosisView() {
   updateSummary([]);
 }
 
+function resetPreview() {
+  document.querySelector("#previewMeta").textContent = "上传后显示系统识别到的工作表、表头和前 30 条志愿。";
+  document.querySelector("#previewFieldMap").innerHTML = "";
+  document.querySelector("#previewBody").innerHTML = "";
+}
+
 function normalizeRow(raw, index, fieldMap) {
   const get = (field) => {
     const header = fieldMap[field];
@@ -698,9 +704,28 @@ function analyzeSheet(sheet, sheetName) {
 
 function buildFieldMap(headers) {
   const fieldMap = {};
+  const usedHeaders = new Set();
+
   Object.entries(headerAliases).forEach(([field, aliases]) => {
-    const found = headers.find((header) => aliases.some((alias) => header === alias || header.includes(alias)));
-    if (found) fieldMap[field] = found;
+    const exact = headers.find((header) => !usedHeaders.has(header) && aliases.some((alias) => header === alias));
+    if (exact) {
+      fieldMap[field] = exact;
+      usedHeaders.add(exact);
+    }
+  });
+
+  Object.entries(headerAliases).forEach(([field, aliases]) => {
+    if (fieldMap[field]) return;
+    const found = headers.find((header) => {
+      if (usedHeaders.has(header)) return false;
+      if (field === "major") return false;
+      if (field === "probability") return /录取概率|专业录取概率|概率/.test(header);
+      return aliases.some((alias) => alias.length > 1 && header.includes(alias));
+    });
+    if (found) {
+      fieldMap[field] = found;
+      usedHeaders.add(found);
+    }
   });
   return fieldMap;
 }
@@ -763,8 +788,58 @@ function applySheetAnalysis(sheetName) {
   }
   currentRows = selected.rows;
   document.querySelector("#sheetPicker").value = sheetName;
+  renderExcelPreview(selected);
   setUploadStatus(`读取成功：工作表“${sheetName}”，识别 ${selected.rows.length} 条志愿。`, "success");
   runAnalysis();
+  switchTab("preview");
+}
+
+function renderExcelPreview(analysis) {
+  const previewRows = analysis.rows.slice(0, 30);
+  document.querySelector("#previewMeta").textContent =
+    `工作表“${analysis.sheetName}”，表头在第 ${analysis.headerRow + 1} 行，已识别 ${analysis.rows.length} 条志愿。请先确认“专业”列没有被识别成录取概率。`;
+  document.querySelector("#previewFieldMap").innerHTML = Object.entries(headerAliases)
+    .map(([field]) => {
+      const header = analysis.fieldMap[field] || "未识别";
+      return `<span class="chip ${header === "未识别" ? "warn" : "source"}">${escapeText(fieldLabel(field))}：${escapeText(header)}</span>`;
+    })
+    .join("");
+  document.querySelector("#previewBody").innerHTML = previewRows
+    .map((row) => `
+      <tr>
+        <td>${escapeText(row.order)}</td>
+        <td>${escapeText(row.school)}</td>
+        <td>${escapeText(row.feature)}</td>
+        <td>${escapeText(row.risk)}</td>
+        <td>${escapeText(row.probability)}</td>
+        <td>${escapeText(row.major)}</td>
+        <td>${escapeText(row.plan)}</td>
+        <td>${escapeText(row.tuition)}</td>
+        <td>${escapeText(row.duration || 4)}</td>
+        <td>${escapeText(row.admissionCount)}</td>
+        <td>${escapeText(row.minScore)}</td>
+        <td>${escapeText(row.minRank)}</td>
+      </tr>
+    `)
+    .join("");
+}
+
+function fieldLabel(field) {
+  const labels = {
+    order: "序号",
+    school: "院校",
+    feature: "院校特色",
+    risk: "风险标签",
+    probability: "专业录取概率",
+    major: "专业",
+    plan: "计划",
+    tuition: "学费",
+    duration: "学制",
+    admissionCount: "录取人数",
+    minScore: "最低分",
+    minRank: "最低位次",
+  };
+  return labels[field] || field;
 }
 
 function clearUploadedFile() {
@@ -777,6 +852,7 @@ function clearUploadedFile() {
   currentRows = [];
   detectedPreferenceState = {};
   setUploadStatus("已删除上传文件，当前没有诊断数据。", "");
+  resetPreview();
   resetDiagnosisView();
 }
 
@@ -901,6 +977,7 @@ function addCustomPreference() {
   detectedPreferenceState[key] = true;
   input.value = "";
   updatePreferenceInsight(analyzedRows);
+  if (analyzedRows.length) runAnalysis();
 }
 
 function handleDetectedPreferenceClick(event) {
@@ -943,4 +1020,5 @@ document.querySelectorAll("input, select").forEach((input) => {
   });
 });
 
+resetPreview();
 resetDiagnosisView();

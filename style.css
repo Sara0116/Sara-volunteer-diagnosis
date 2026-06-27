@@ -458,6 +458,20 @@ table {
   min-width: 2100px;
 }
 
+#previewView table {
+  min-width: 1500px;
+}
+
+.field-map-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.preview-table-wrap {
+  margin-top: 0;
+}
+
 th,
 td {
   border-bottom: 1px solid var(--line);
