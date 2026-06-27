@@ -168,7 +168,7 @@ function getRankReference(row) {
   return item;
 }
 
-function getAdmissionReference(row, rank) {
+function getAdmissionReference(row, rank, candidateScore) {
   const item = getRankReference(row);
   const years = [];
   if (item?.y2024?.rank) years.push({ year: 2024, ...item.y2024 });
@@ -178,14 +178,14 @@ function getAdmissionReference(row, rank) {
     const fallbackScore = Number(row.minScore) || 0;
     return {
       years: fallbackRank ? [{ year: 2025, rank: fallbackRank, score: fallbackScore, plan: Number(row.plan) || 0 }] : [],
-      score: admissionScoreFromRanks([{ rank: fallbackRank, plan: Number(row.plan) || 0 }], rank),
-      level: admissionLevel([{ rank: fallbackRank }], rank),
+      score: admissionScoreFromRanks([{ rank: fallbackRank, score: fallbackScore, plan: Number(row.plan) || 0 }], rank, candidateScore),
+      level: admissionLevel([{ rank: fallbackRank, score: fallbackScore }], rank, candidateScore),
       trend: "仅表内数据",
-      detail: fallbackRank ? `2025表内位次${fallbackRank}` : "缺少历史位次",
+      detail: fallbackRank ? `2025表内位次${fallbackRank}；${formatScoreGap([{ year: 2025, score: fallbackScore }], candidateScore)}` : "缺少历史位次",
       source: "上传表格",
     };
   }
-  const score = admissionScoreFromRanks(years, rank);
+  const score = admissionScoreFromRanks(years, rank, candidateScore);
   const y2024 = years.find((year) => year.year === 2024);
   const y2025 = years.find((year) => year.year === 2025);
   let trend = "两年参考";
@@ -198,23 +198,33 @@ function getAdmissionReference(row, rank) {
   return {
     years,
     score,
-    level: admissionLevel(years, rank),
+    level: admissionLevel(years, rank, candidateScore),
     trend,
-    detail: formatReferenceYears(years, rank),
+    detail: `${formatReferenceYears(years, rank, candidateScore)}；${formatScoreGap(years, candidateScore)}`,
     source: "2024/2025浙江考试院投档线",
   };
 }
 
-function admissionLevel(years, rank) {
+function admissionLevel(years, rank, candidateScore = 0) {
   const validYears = years.filter((year) => Number(year.rank));
   if (!validYears.length) return "待核";
   const avgDiff = validYears.reduce((sum, year) => sum + (year.rank - rank), 0) / validYears.length;
-  if (avgDiff < -1200) return "冲";
-  if (avgDiff <= 9000) return "稳";
+  const avgScore = averageYearScore(validYears);
+  const scoreDiff = avgScore && candidateScore ? candidateScore - avgScore : 0;
+  if (avgDiff < -1200) {
+    if (avgDiff > -3500 && scoreDiff >= 3) return "稳";
+    return "冲";
+  }
+  if (avgDiff <= 9000) {
+    if (avgDiff < 1500 && scoreDiff <= -4) return "冲";
+    if (avgDiff > 6000 && scoreDiff >= 6) return "保";
+    return "稳";
+  }
+  if (avgDiff < 14000 && scoreDiff <= -5) return "稳";
   return "保";
 }
 
-function admissionScoreFromRanks(years, rank) {
+function admissionScoreFromRanks(years, rank, candidateScore = 0) {
   const validYears = years.filter((year) => Number(year.rank));
   if (!validYears.length) return 45;
   const diffs = validYears.map((year) => year.rank - rank);
@@ -230,15 +240,39 @@ function admissionScoreFromRanks(years, rank) {
   else score = 94;
   if (worstDiff < -5000) score -= 6;
   if (validYears.some((year) => Number(year.plan) > 0 && Number(year.plan) <= 2)) score -= 10;
+  const avgScore = averageYearScore(validYears);
+  if (avgScore && candidateScore) {
+    const scoreDiff = candidateScore - avgScore;
+    if (scoreDiff >= 6) score += 4;
+    else if (scoreDiff >= 3) score += 2;
+    else if (scoreDiff <= -6) score -= 4;
+    else if (scoreDiff <= -3) score -= 2;
+  }
   return clamp(score, 10, 98);
 }
 
-function formatReferenceYears(years, rank) {
+function averageYearScore(years) {
+  const scoreYears = years.filter((year) => Number(year.score));
+  if (!scoreYears.length) return 0;
+  return scoreYears.reduce((sum, year) => sum + Number(year.score), 0) / scoreYears.length;
+}
+
+function formatScoreGap(years, candidateScore) {
+  const avgScore = averageYearScore(years);
+  if (!avgScore || !candidateScore) return "分数仅辅助，位次为主";
+  const diff = Math.round((candidateScore - avgScore) * 10) / 10;
+  if (diff > 0) return `考生${candidateScore}分，比近年均分高${diff}分`;
+  if (diff < 0) return `考生${candidateScore}分，比近年均分低${Math.abs(diff)}分`;
+  return `考生${candidateScore}分，与近年均分基本一致`;
+}
+
+function formatReferenceYears(years, rank, candidateScore = 0) {
   return years
     .map((year) => {
       const diff = year.rank - rank;
       const diffText = diff >= 0 ? `宽${diff}` : `高${Math.abs(diff)}`;
-      return `${year.year}：${year.score}分/${year.rank}位（${diffText}位）`;
+      const scoreText = candidateScore && year.score ? `，${candidateScore - year.score >= 0 ? "高" : "低"}${Math.abs(candidateScore - year.score)}分` : "";
+      return `${year.year}：${year.score}分/${year.rank}位（${diffText}位${scoreText}）`;
     })
     .join("；");
 }
@@ -315,6 +349,7 @@ function preferenceScore(row, schoolProfile, majorProfile, desiredPrefs) {
 }
 
 function analyzeRow(row) {
+  const candidateScore = Number(document.querySelector("#scoreInput").value) || 0;
   const rank = Number(document.querySelector("#rankInput").value) || 62895;
   const goal = document.querySelector("#goalInput").value;
   const prefs = getRejectedPrefs();
@@ -337,7 +372,7 @@ function analyzeRow(row) {
     postgradText: "需核对可衔接的硕士方向和学校培养口径",
     civilText: "需核对国考/省考职位表专业目录",
   });
-  const reference = getAdmissionReference(row, rank);
+  const reference = getAdmissionReference(row, rank, candidateScore);
   const admission = reference.score;
   const weights = getGoalWeights(goal);
   const preference = preferenceScore(row, schoolProfile, majorProfile, desiredPrefs);
@@ -1016,6 +1051,11 @@ document.querySelectorAll(".tab").forEach((button) => {
 });
 document.querySelectorAll("input, select").forEach((input) => {
   input.addEventListener("change", () => {
+    if (analyzedRows.length) runAnalysis();
+  });
+});
+["#scoreInput", "#rankInput"].forEach((selector) => {
+  document.querySelector(selector).addEventListener("input", () => {
     if (analyzedRows.length) runAnalysis();
   });
 });
