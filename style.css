@@ -225,6 +225,60 @@ select:focus {
   line-height: 1.6;
 }
 
+.preference-edit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px;
+  gap: 8px;
+}
+
+.preference-edit-row input {
+  height: 34px;
+}
+
+.preference-edit-row button {
+  height: 34px;
+  font-size: 13px;
+}
+
+.preference-empty {
+  color: var(--muted);
+}
+
+.detected-pref {
+  gap: 5px;
+  cursor: pointer;
+}
+
+.detected-pref input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+.detected-pref:has(input:not(:checked)) {
+  background: #eef2f7;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.remove-pref {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.7);
+  color: inherit;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.remove-pref:hover {
+  background: rgba(30, 41, 59, 0.1);
+}
+
 .upload-box {
   display: grid;
   min-height: 112px;

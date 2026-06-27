@@ -88,10 +88,13 @@ const headerAliases = {
   minRank: ["最低位次", "位次"],
 };
 
-let currentRows = [...sampleRows];
+let currentRows = [];
 let analyzedRows = [];
 let workbookCache = null;
 let sheetAnalyses = [];
+let detectedPreferenceState = {};
+let customDetectedPreferences = [];
+let customPreferenceCounter = 0;
 
 const concernLabels = {
   outsideSchool: "省外学校",
@@ -118,6 +121,10 @@ function getRejectedPrefs() {
 
 function getDesiredPrefs() {
   return [...document.querySelectorAll('input[data-pref-type="desired"]:checked')].map((node) => node.value);
+}
+
+function getActiveDetectedPrefs() {
+  return [...document.querySelectorAll('input[data-pref-type="detected"]:checked')].map((node) => node.value);
 }
 
 function getGoalWeights(goal) {
@@ -289,17 +296,20 @@ function preferenceScore(row, schoolProfile, majorProfile, desiredPrefs) {
   const school = row.school || "";
   const feature = row.feature || "";
   const isZhejiang = /浙江|温州|嘉兴|杭州|浙大|中国计量/.test(school);
+  const hasPref = (...values) => values.some((value) => desiredPrefs.includes(value));
   let score = 72;
 
-  if (desiredPrefs.includes("zhejiang")) score += isZhejiang ? 8 : -6;
-  if (desiredPrefs.includes("public")) {
+  if (hasPref("zhejiang", "detected_zhejiang")) score += isZhejiang ? 8 : -6;
+  if (hasPref("detected_outside") && !isZhejiang) score += 4;
+  if (hasPref("public", "detected_public")) {
     if (/民办|独立|中外合作/.test(feature + row.major)) score -= 8;
     else if (schoolProfile.score >= 68) score += 6;
   }
-  if (desiredPrefs.includes("schoolTier")) score += (schoolProfile.score - 70) * 0.35;
-  if (desiredPrefs.includes("majorCareer")) score += (majorProfile.employment - 70) * 0.35;
-  if (desiredPrefs.includes("civilFriendly")) score += (majorProfile.civil - 70) * 0.3;
-  if (desiredPrefs.includes("postgradValue")) score += (majorProfile.postgrad - 70) * 0.3;
+  if (hasPref("schoolTier", "detected_schoolTier")) score += (schoolProfile.score - 70) * 0.35;
+  if (hasPref("majorCareer", "detected_csData", "detected_finance", "detected_electric")) score += (majorProfile.employment - 70) * 0.35;
+  if (hasPref("civilFriendly")) score += (majorProfile.civil - 70) * 0.3;
+  if (hasPref("postgradValue")) score += (majorProfile.postgrad - 70) * 0.3;
+  if (hasPref("detected_smallPlan") && Number(row.plan) > 0 && Number(row.plan) <= 2) score -= 4;
 
   return Math.round(clamp(score, 45, 96));
 }
@@ -308,7 +318,7 @@ function analyzeRow(row) {
   const rank = Number(document.querySelector("#rankInput").value) || 62895;
   const goal = document.querySelector("#goalInput").value;
   const prefs = getRejectedPrefs();
-  const desiredPrefs = getDesiredPrefs();
+  const desiredPrefs = [...getDesiredPrefs(), ...getActiveDetectedPrefs()];
   const schoolProfile = getProfile(schoolProfiles, row.school, {
     score: 62,
     level: "待核",
@@ -544,7 +554,7 @@ function updatePreferenceInsight(rows) {
   const target = document.querySelector("#preferenceInsight");
   if (!target) return;
   if (!rows.length) {
-    target.textContent = "等待上传或诊断后生成";
+    target.innerHTML = renderDetectedPreferenceTags(customDetectedPreferences);
     return;
   }
 
@@ -560,22 +570,47 @@ function updatePreferenceInsight(rows) {
   const smallPlanCount = count((row) => Number(row.plan) > 0 && Number(row.plan) <= 2);
 
   const tags = [];
-  const addTag = (text, tone = "source") => tags.push({ text, tone });
-  if (provinceCount / total >= 0.65) addTag(`省内倾向明显 ${provinceCount}/${total}`, "good");
-  else if (provinceCount / total <= 0.35) addTag(`省外接受度较高 ${total - provinceCount}/${total}`, "warn");
-  if (publicCount / total >= 0.8) addTag("公办/非高费倾向明显", "good");
-  if (strongSchoolCount / total >= 0.5) addTag("较看重学校层次", "good");
-  if (csDataCount / total >= 0.35) addTag("计算机/数据方向集中", "source");
-  if (financeCount / total >= 0.25) addTag("财经/统计/财会方向较多", "source");
-  if (electricCount / total >= 0.25) addTag("电气/自动化/电子信息方向较多", "source");
-  if (rushCount / total >= 0.45) addTag("冲刺比例偏高", "warn");
-  if (smallPlanCount / total >= 0.2) addTag("小计划志愿较多", "warn");
-  if (!tags.length) addTag("偏好较分散，建议人工确认优先级", "warn");
+  const addTag = (key, text, tone = "source") => tags.push({ key, text, tone });
+  if (provinceCount / total >= 0.65) addTag("detected_zhejiang", `省内倾向明显 ${provinceCount}/${total}`, "good");
+  else if (provinceCount / total <= 0.35) addTag("detected_outside", `省外接受度较高 ${total - provinceCount}/${total}`, "warn");
+  if (publicCount / total >= 0.8) addTag("detected_public", "公办/非高费倾向明显", "good");
+  if (strongSchoolCount / total >= 0.5) addTag("detected_schoolTier", "较看重学校层次", "good");
+  if (csDataCount / total >= 0.35) addTag("detected_csData", "计算机/数据方向集中", "source");
+  if (financeCount / total >= 0.25) addTag("detected_finance", "财经/统计/财会方向较多", "source");
+  if (electricCount / total >= 0.25) addTag("detected_electric", "电气/自动化/电子信息方向较多", "source");
+  if (rushCount / total >= 0.45) addTag("detected_rushHigh", "冲刺比例偏高", "warn");
+  if (smallPlanCount / total >= 0.2) addTag("detected_smallPlan", "小计划志愿较多", "warn");
+  if (!tags.length) addTag("detected_scattered", "偏好较分散，建议人工确认优先级", "warn");
 
-  target.innerHTML = tags.map((tag) => `<span class="chip ${tag.tone}">${escapeText(tag.text)}</span>`).join("");
+  target.innerHTML = renderDetectedPreferenceTags([...tags, ...customDetectedPreferences]);
+}
+
+function renderDetectedPreferenceTags(tags) {
+  if (!tags.length) return `<span class="preference-empty">上传志愿表后自动识别，也可以手动添加。</span>`;
+  return tags
+    .map((tag) => {
+      const checked = detectedPreferenceState[tag.key] !== false;
+      const removeButton = tag.custom ? `<button class="remove-pref" type="button" data-pref-remove="${escapeAttr(tag.key)}">×</button>` : "";
+      return `
+        <label class="detected-pref chip ${tag.tone}">
+          <input type="checkbox" data-pref-type="detected" value="${escapeAttr(tag.key)}" ${checked ? "checked" : ""} />
+          <span>${escapeText(tag.text)}</span>
+          ${removeButton}
+        </label>
+      `;
+    })
+    .join("");
 }
 
 function updateSummary(rows) {
+  if (!rows.length) {
+    document.querySelector("#summaryTitle").textContent = "等待诊断";
+    document.querySelector("#averageScore").textContent = "--";
+    document.querySelector("#changedCount").textContent = "--";
+    document.querySelector("#cautionCount").textContent = "--";
+    updatePreferenceInsight(rows);
+    return;
+  }
   const average = rows.length ? Math.round(rows.reduce((sum, row) => sum + row.score, 0) / rows.length) : 0;
   const adjusted = sortForZhejiang(rows).filter((row, index) => Number(row.order) !== index + 1).length;
   const caution = rows.filter((row) => row.tag === "慎填").length;
@@ -587,10 +622,23 @@ function updateSummary(rows) {
 }
 
 function runAnalysis() {
+  if (!currentRows.length) {
+    resetDiagnosisView();
+    setUploadStatus("请先上传志愿表，再开始诊断。", "error");
+    return;
+  }
+  updatePreferenceInsight(currentRows);
   analyzedRows = currentRows.map(analyzeRow);
   renderOriginal(analyzedRows);
   renderAdjusted(analyzedRows);
   updateSummary(analyzedRows);
+}
+
+function resetDiagnosisView() {
+  analyzedRows = [];
+  document.querySelector("#originalBody").innerHTML = "";
+  document.querySelector("#adjustedBody").innerHTML = "";
+  updateSummary([]);
 }
 
 function normalizeRow(raw, index, fieldMap) {
@@ -726,9 +774,10 @@ function clearUploadedFile() {
   document.querySelector("#sheetPickerWrap").classList.add("hidden");
   workbookCache = null;
   sheetAnalyses = [];
-  currentRows = [...sampleRows];
-  setUploadStatus("已删除上传文件，当前恢复为示例数据。", "");
-  runAnalysis();
+  currentRows = [];
+  detectedPreferenceState = {};
+  setUploadStatus("已删除上传文件，当前没有诊断数据。", "");
+  resetDiagnosisView();
 }
 
 function setUploadStatus(message, type) {
@@ -743,7 +792,10 @@ function exportReport() {
     alert("Excel 导出库没有加载成功。");
     return;
   }
-  if (!analyzedRows.length) runAnalysis();
+  if (!analyzedRows.length) {
+    alert("请先上传志愿表并完成诊断后再导出。");
+    return;
+  }
   const originalSheet = analyzedRows.map((row) => ({
     原序号: row.order,
     院校: row.school,
@@ -840,11 +892,48 @@ function switchTab(tab) {
   document.querySelector(`#${tab}View`).classList.add("active-view");
 }
 
+function addCustomPreference() {
+  const input = document.querySelector("#customPreferenceInput");
+  const text = input.value.trim();
+  if (!text) return;
+  const key = `custom_${Date.now()}_${customPreferenceCounter++}`;
+  customDetectedPreferences.push({ key, text, tone: "source", custom: true });
+  detectedPreferenceState[key] = true;
+  input.value = "";
+  updatePreferenceInsight(analyzedRows);
+}
+
+function handleDetectedPreferenceClick(event) {
+  const removeKey = event.target.dataset.prefRemove;
+  if (removeKey) {
+    event.preventDefault();
+    event.stopPropagation();
+    customDetectedPreferences = customDetectedPreferences.filter((item) => item.key !== removeKey);
+    delete detectedPreferenceState[removeKey];
+    updatePreferenceInsight(analyzedRows);
+    if (analyzedRows.length) runAnalysis();
+    return;
+  }
+
+  if (event.target.matches('input[data-pref-type="detected"]')) {
+    detectedPreferenceState[event.target.value] = event.target.checked;
+    if (analyzedRows.length) runAnalysis();
+  }
+}
+
 document.querySelector("#fileInput").addEventListener("change", handleFile);
 document.querySelector("#clearFileButton").addEventListener("click", clearUploadedFile);
 document.querySelector("#sheetPicker").addEventListener("change", (event) => applySheetAnalysis(event.target.value));
 document.querySelector("#analyzeButton").addEventListener("click", runAnalysis);
 document.querySelector("#exportButton").addEventListener("click", exportReport);
+document.querySelector("#addPreferenceButton").addEventListener("click", addCustomPreference);
+document.querySelector("#customPreferenceInput").addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    addCustomPreference();
+  }
+});
+document.querySelector("#preferenceInsight").addEventListener("click", handleDetectedPreferenceClick);
 document.querySelectorAll(".tab").forEach((button) => {
   button.addEventListener("click", () => switchTab(button.dataset.tab));
 });
@@ -854,4 +943,4 @@ document.querySelectorAll("input, select").forEach((input) => {
   });
 });
 
-runAnalysis();
+resetDiagnosisView();
