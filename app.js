@@ -182,6 +182,8 @@ function getAdmissionReference(row, rank, candidateScore) {
       level: admissionLevel([{ rank: fallbackRank, score: fallbackScore }], rank, candidateScore),
       trend: "仅表内数据",
       detail: fallbackRank ? `2025表内位次${fallbackRank}；${formatScoreGap([{ year: 2025, score: fallbackScore }], candidateScore)}` : "缺少历史位次",
+      scoreGap: formatScoreGap([{ year: 2025, score: fallbackScore }], candidateScore),
+      consistencyNote: admissionConsistencyNote([{ rank: fallbackRank, score: fallbackScore }], rank, candidateScore),
       source: "上传表格",
     };
   }
@@ -201,8 +203,21 @@ function getAdmissionReference(row, rank, candidateScore) {
     level: admissionLevel(years, rank, candidateScore),
     trend,
     detail: `${formatReferenceYears(years, rank, candidateScore)}；${formatScoreGap(years, candidateScore)}`,
+    scoreGap: formatScoreGap(years, candidateScore),
+    consistencyNote: admissionConsistencyNote(years, rank, candidateScore),
     source: "2024/2025浙江考试院投档线",
   };
+}
+
+function admissionConsistencyNote(years, rank, candidateScore) {
+  const validYears = years.filter((year) => Number(year.rank));
+  const avgScore = averageYearScore(validYears);
+  if (!validYears.length || !avgScore || !candidateScore) return "";
+  const avgDiff = validYears.reduce((sum, year) => sum + (year.rank - rank), 0) / validYears.length;
+  const scoreDiff = candidateScore - avgScore;
+  if (scoreDiff >= 15 && avgDiff < 6000) return "分数明显高于历史线，建议同步核对全省位次";
+  if (scoreDiff <= -8 && avgDiff > -1200) return "分数低于历史线较多，建议同步核对全省位次";
+  return "";
 }
 
 function admissionLevel(years, rank, candidateScore = 0) {
@@ -211,6 +226,9 @@ function admissionLevel(years, rank, candidateScore = 0) {
   const avgDiff = validYears.reduce((sum, year) => sum + (year.rank - rank), 0) / validYears.length;
   const avgScore = averageYearScore(validYears);
   const scoreDiff = avgScore && candidateScore ? candidateScore - avgScore : 0;
+  if (scoreDiff >= 15) return "保";
+  if (scoreDiff >= 5 && avgDiff > -12000) return avgDiff > 6000 ? "保" : "稳";
+  if (scoreDiff <= -8) return "冲";
   if (avgDiff < -1200) {
     if (avgDiff > -3500 && scoreDiff >= 3) return "稳";
     return "冲";
@@ -243,10 +261,16 @@ function admissionScoreFromRanks(years, rank, candidateScore = 0) {
   const avgScore = averageYearScore(validYears);
   if (avgScore && candidateScore) {
     const scoreDiff = candidateScore - avgScore;
-    if (scoreDiff >= 6) score += 4;
-    else if (scoreDiff >= 3) score += 2;
-    else if (scoreDiff <= -6) score -= 4;
-    else if (scoreDiff <= -3) score -= 2;
+    if (scoreDiff >= 30) score += 24;
+    else if (scoreDiff >= 15) score += 18;
+    else if (scoreDiff >= 8) score += 12;
+    else if (scoreDiff >= 3) score += 6;
+    else if (scoreDiff >= 1) score += 2;
+    else if (scoreDiff <= -30) score -= 24;
+    else if (scoreDiff <= -15) score -= 18;
+    else if (scoreDiff <= -8) score -= 12;
+    else if (scoreDiff <= -3) score -= 6;
+    else if (scoreDiff <= -1) score -= 2;
   }
   return clamp(score, 10, 98);
 }
@@ -275,6 +299,14 @@ function formatReferenceYears(years, rank, candidateScore = 0) {
       return `${year.year}：${year.score}分/${year.rank}位（${diffText}位${scoreText}）`;
     })
     .join("；");
+}
+
+function yearScoreGap(year, candidateScore) {
+  if (!candidateScore || !Number(year.score)) return "";
+  const diff = candidateScore - Number(year.score);
+  if (diff > 0) return `高${diff}分`;
+  if (diff < 0) return `低${Math.abs(diff)}分`;
+  return "同分";
 }
 
 function riskPenalty(row, prefs, majorProfile, schoolProfile) {
@@ -512,7 +544,9 @@ function renderAdmission(row) {
     <div class="admission-stack">
       <span class="tag-pill ${tagClass(reference.level)}">${escapeText(reference.level)}</span>
       <span class="chip source">${escapeText(reference.trend)}</span>
-      ${reference.years.map((year) => `<div><strong>${year.year}</strong> ${year.score}分 / ${year.rank}位</div>`).join("")}
+      ${reference.scoreGap ? `<span class="chip ${reference.scoreGap.includes("低") ? "warn" : "good"}">${escapeText(reference.scoreGap)}</span>` : ""}
+      ${reference.consistencyNote ? `<span class="chip warn">${escapeText(reference.consistencyNote)}</span>` : ""}
+      ${reference.years.map((year) => `<div><strong>${year.year}</strong> ${year.score}分 / ${year.rank}位 ${yearScoreGap(year, Number(document.querySelector("#scoreInput").value) || 0) ? `<small>(${escapeText(yearScoreGap(year, Number(document.querySelector("#scoreInput").value) || 0))})</small>` : ""}</div>`).join("")}
     </div>
   `;
 }
